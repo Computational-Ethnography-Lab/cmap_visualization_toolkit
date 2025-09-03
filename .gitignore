@@ -148,6 +148,10 @@ __marimo__/
 !README.md
 !visualization_toolkit_final.ipynb
 !LICENSE.md
+!clustermap_temp.png
+!environment.yml
+!install.sh
+!requirements.txt
 
 # Allow specific directories
 !/data
