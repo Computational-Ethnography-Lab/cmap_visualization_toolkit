@@ -95,6 +95,18 @@ If the one-command method doesn't work, try these step-by-step commands:
 # 1. Clone the repository
 git clone https://github.com/Computational-Ethnography-Lab/cmap_visualization_toolkit.git
 cd cmap_visualization_toolkit
+When prompted by GitHub:
+	•	Username: Enter your GitHub username (e.g., your-username).
+	•	Password: ⚠This is **not your GitHub login password**. GitHub now requires a ** Personal Access Token (PAT)** instead.
+
+How to get a Personal Access Token (PAT):
+	1.	Log into GitHub.
+	2.	Go to Settings -> Developer settings -> Personal access tokens -> Tokens (classic).
+	3.	Click Generate new token (classic), give it a name, set an expiration, and check the box for repo.
+	4.	Copy the generated token (you will only see it once).
+	5.	When Git asks for your password, paste this token.
+
+Tip: To avoid typing your PAT every time, you can save it using Git Credential Manager or macOS Keychain.
 
 # 2. Create and activate conda environment
 conda create -y --name cmap_visualization_toolkit python=3.11
