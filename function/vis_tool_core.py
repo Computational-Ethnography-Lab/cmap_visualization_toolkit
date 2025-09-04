@@ -689,7 +689,7 @@ def train_embedding(sentences, context_window, stop_list, seed_words, clustering
                     num_words, lemmatize=True, min_word_frequency=2, reuse_clusterings=True, 
                     cross_pos_normalize=False, distance_metric="default", custom_word_filter=None, 
                     semantic_categories=None, 
-                    link_threshold=None, link_color_threshold=None, title_word='Dementia(embeddings)'):
+                    link_threshold=None, link_color_threshold=None):
     """
     Generate word embeddings and similarity/co-occurrence matrices based on the specified clustering method.
     
@@ -1228,7 +1228,6 @@ def plot_semantic_network(word_embeddings, seed_words, clustering_method,
                           similarity_matrix=None, co_occurrence_matrix=None,
                           semantic_categories=None,
                           link_threshold=None, link_color_threshold=None,
-                          title_word='Dementia(embeddings)',
                           distance_metric="default",
                           network_layout="kamada-kawai"):
     """
@@ -1244,7 +1243,6 @@ def plot_semantic_network(word_embeddings, seed_words, clustering_method,
     semantic_categories  : dict | None    optional; word groupings with assigned colors
     link_threshold       : float | None   optional; minimum edge weight to include in plot
     link_color_threshold : float | None   optional; minimum edge weight to highlight as strong
-    title_word           : str            plot title (default = "Dementia(embeddings)")
     distance_metric      : str            "default" = co-occurrence | "cosine" = similarity between vectors
     network_layout       : str            Layout algorithm for positioning nodes.
                                           Options: "spring", "kamada-kawai", "circular", "shell"
@@ -1714,9 +1712,6 @@ def plot_semantic_network(word_embeddings, seed_words, clustering_method,
     legend_handles.append(plt.Line2D([0],[0],color='#cccccc',lw=1.5,
                         label='Edge width = association strength'))
 
-    display_title = title_word or (seed_words[0].upper() if seed_words else "Network")
-    plt.title(f"{display_title}",
-              fontsize=30,fontweight='bold')
     plt.legend(handles=legend_handles,loc='upper right',
                bbox_to_anchor=(1.0,0.0),frameon=False, fontsize=16)
     plt.axis('off'); plt.tight_layout(); return fig
@@ -1742,6 +1737,7 @@ def run_visuals_pipeline(input_data):
             word_to_base[variant.lower()] = base_word
 
     seed_groups, seed_words, use_group_label = {}, [], False
+    auto_selected_seeds = False
 
     df = pd.read_csv(input_data.filepath)
     
@@ -1989,23 +1985,23 @@ def run_visuals_pipeline(input_data):
 
     print("-----------------------------------------------")
     print("Plotting semantic network (plain, no categories)...")
-    fig = plot_semantic_network(
+    fig_sn1 = plot_semantic_network(
         word_embeddings,
-        seed_words,
+        [] if auto_selected_seeds else seed_words,
         input_data.clustering_method,
         similarity_matrix, co_occurrence_matrix,
         semantic_categories=None,               
         link_threshold = input_data.link_threshold,
         link_color_threshold= input_data.link_color_threshold,
-        title_word = getattr(input_data, 'title_word', None),
-        distance_metric=getattr(input_data, 'distance_metric', 'default'),
-        network_layout=getattr(input_data, 'network_layout', 'kamada-kawai'))
-    
-    filename = f"semantic_network_plain_{input_data.clustering_method}_{input_data.distance_metric}.png"
+        distance_metric=getattr(input_data, 'distance_metric', 'default'))
+    filename = f"semantic_network_plain_m{input_data.clustering_method}_{input_data.distance_metric}.png"
     os.makedirs(OUTPUT_DIR, exist_ok=True)
     out_path = os.path.join(OUTPUT_DIR, filename)
 
-    fig.savefig(out_path, dpi=300, bbox_inches="tight")
+    fig_sn1.suptitle("Semantic Network (Plain)", fontsize=30, y=0.98, fontweight='bold')
+    fig_sn1.subplots_adjust(top=0.95)
+
+    fig_sn1.savefig(out_path, dpi=300, bbox_inches="tight")
     print(f"✔ [OK] Saved {out_path}")
 
     plt.show()
@@ -2019,7 +2015,7 @@ def run_visuals_pipeline(input_data):
         
         print("\nUsing predefined semantic categories for custom grouping")
         # Use seed_words instead of empty list for the colored visualization
-        fig = plot_semantic_network(
+        fig_sn2 = plot_semantic_network(
             word_embeddings,
             seed_words,
             input_data.clustering_method,
@@ -2027,15 +2023,16 @@ def run_visuals_pipeline(input_data):
             semantic_categories = input_data.semantic_categories,
             link_threshold     = input_data.link_threshold,
             link_color_threshold = input_data.link_color_threshold,
-            title_word = getattr(input_data, 'title_word', None),
-            distance_metric=getattr(input_data, 'distance_metric', 'default'),
-            network_layout=getattr(input_data, 'network_layout', 'kamada-kawai')
+            distance_metric=getattr(input_data, 'distance_metric', 'default')
         )
-        filename = f"semantic_network_plain_custom_colors{input_data.clustering_method}_{input_data.distance_metric}.png"
+        filename = f"semantic_network_customcolor_m{input_data.clustering_method}_{input_data.distance_metric}.png"
         os.makedirs(OUTPUT_DIR, exist_ok=True)
         out_path = os.path.join(OUTPUT_DIR, filename)
 
-        fig.savefig(out_path, dpi=300, bbox_inches="tight")
+        fig_sn2.suptitle("Semantic Network (Custom Colors)", fontsize=30, y=0.98, fontweight='bold')
+        fig_sn2.subplots_adjust(top=0.95)
+
+        fig_sn2.savefig(out_path, dpi=300, bbox_inches="tight")
         print(f"✔ [OK] Saved {out_path}")
 
         plt.show()
@@ -2066,24 +2063,22 @@ def run_visuals_pipeline(input_data):
         
         # Plot the filtered network
         print(f"Plotting secondary network with {len(non_seed_words)} nodes (seeds hidden)...")
-        fig = plot_semantic_network(
+        fig_sn3 = plot_semantic_network(
             non_seed_embeddings, [], 
             input_data.clustering_method, 
             filtered_similarity, filtered_co_occurrence, 
             semantic_categories=None,
             link_threshold=input_data.link_threshold,
             link_color_threshold=input_data.link_color_threshold,
-            title_word=getattr(input_data, 'title_word', None),
-            distance_metric=getattr(input_data, 'distance_metric', 'default'),
-            network_layout=getattr(input_data, 'network_layout', 'kamada-kawai')
+            distance_metric=getattr(input_data, 'distance_metric', 'default')
         )
         filename = f"semantic_network_noseeds_m{input_data.clustering_method}_{input_data.distance_metric}.png"
-        os.makedirs(OUTPUT_DIR, exist_ok=True)
         out_path = os.path.join(OUTPUT_DIR, filename)
-
-        fig.savefig(out_path, dpi=300, bbox_inches="tight")
+        fig_sn3.savefig(out_path, dpi=300, bbox_inches="tight")
         print(f"✔ [OK] Saved {out_path}")
-        fig.subplots_adjust(top=0.95)
+
+        fig_sn3.suptitle("Semantic Network (Seeds Hidden)", fontsize=30, y=0.98, fontweight='bold')
+        fig_sn3.subplots_adjust(top=0.95)
         plt.show()
         
         # If custom coloring was used in the first visualization, also do it for the second
@@ -2091,24 +2086,22 @@ def run_visuals_pipeline(input_data):
             semantic_categories = input_data.semantic_categories
             print("\nGenerating secondary network with custom grouping (seeds hidden)...")
 
-            fig = plot_semantic_network(
+            fig_sn4 = plot_semantic_network(
                 non_seed_embeddings, [], 
                 input_data.clustering_method, 
                 filtered_similarity, filtered_co_occurrence, 
                 semantic_categories=semantic_categories,
                 link_threshold=input_data.link_threshold,
                 link_color_threshold=input_data.link_color_threshold,
-                title_word=getattr(input_data, 'title_word', None),
-                distance_metric=getattr(input_data, 'distance_metric', 'default'),
-                network_layout=getattr(input_data, 'network_layout', 'kamada-kawai'))
-            fig.suptitle("Semantic Network with Custom Grouping (Seeds Hidden)", fontsize=18, y=0.98)
+                distance_metric=getattr(input_data, 'distance_metric', 'default')
+            )
             filename = f"semantic_network_noseeds_customcolor_m{input_data.clustering_method}_{input_data.distance_metric}.png"
-            os.makedirs(OUTPUT_DIR, exist_ok=True)
             out_path = os.path.join(OUTPUT_DIR, filename)
-
-            fig.savefig(out_path, dpi=300, bbox_inches="tight")
+            fig_sn4.savefig(out_path, dpi=300, bbox_inches="tight")
             print(f"✔ [OK] Saved {out_path}")
-            fig.subplots_adjust(top=0.95)
+
+            fig_sn4.suptitle("Semantic Network with Custom Grouping (Seeds Hidden)", fontsize=30, y=0.98, fontweight='bold')
+            fig_sn4.subplots_adjust(top=0.95)
             plt.show()
     else:
         print("Not enough non-seed nodes to generate a meaningful secondary network.")
