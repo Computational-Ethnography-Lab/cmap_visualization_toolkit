@@ -67,17 +67,19 @@ For the simplest installation, follow these steps:
    ```
    
 When prompted by GitHub:
-	•	Username: Enter your GitHub username (e.g., your-username).
-	•	Password: ⚠This is **not your GitHub login password**. GitHub now requires a ** Personal Access Token (PAT)** instead.
+
+- **Username:** Enter your GitHub username (e.g., `your-username`).  
+- **Password:** This is **not your GitHub login password**. GitHub now requires a **Personal Access Token (PAT)** instead.  
 
 **How to get a Personal Access Token (PAT):**
-	1.	Log into GitHub.
-	2.	Go to Settings -> Developer settings -> Personal access tokens -> Tokens (classic).
-	3.	Click Generate new token (classic), give it a name, set an expiration, and check the box for repo.
-	4.	Copy the generated token (you will only see it once).
-	5.	When Git asks for your password, paste this token.
 
-Tip: To avoid typing your PAT every time, you can save it using Git Credential Manager or macOS Keychain.
+- Log into [GitHub](https://github.com).  
+- Go to **Settings -> Developer settings -> Personal access tokens -> Tokens (classic)**.  
+- Click **Generate new token (classic)**, give it a name, set an expiration, and check the box for `repo`.  
+- Copy the generated token (you will only see it once).  
+- When Git asks for your password, paste this token.  
+
+> **Tip:** To avoid typing your PAT every time, you can save it using Git Credential Manager or macOS Keychain.
 
 2. **Run the installation script**:
 
