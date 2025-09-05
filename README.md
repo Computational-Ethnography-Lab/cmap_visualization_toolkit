@@ -99,7 +99,7 @@ When prompted by GitHub:
 
 3. **Launch Jupyter Notebook**:
    ```bash
-   jupyter notebook visulization_toolkit_final.ipynb
+   jupyter notebook visualization_toolkit_final.ipynb
    ```
 
 ### Step-by-Step Installation
