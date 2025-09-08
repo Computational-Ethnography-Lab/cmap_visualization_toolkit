@@ -26,7 +26,7 @@ An easy-to-use toolkit for visualizing patterns in qualitative data, helping res
 
 ## Overview
 
-The CMAP Visualization Toolkit helps you examine patterns in text data (e.g. qualitative interviews, fieldnotes, and documents) using visual tools. It provides a bridge to combine computational text analysis with qualitative research methods to identify patterns and visualize relationships (based on academic work by Abramson et al. 2018, 2025).
+The CMAP Visualization Toolkit helps you examine patterns in text data (e.g. qualitative interviews, fieldnotes, and documents) using visual tools. It provides a bridge to combine computational text analysis with qualitative research methods to identify patterns and visualize relationships (based on academic work by Abramson et al. 2018, 2025). For more information, please see the [computational ethnography lab repository](https://github.com/Computational-Ethnography-Lab/Computational-Ethnography-Lab). 
 
 The notebook included with this toolkit explains all the methods in detail.
 
@@ -40,12 +40,14 @@ This toolkit gives you several ways to analyze and visualize your text data:
 
 3. **Word-Level Visualizations**:
    - **Word Clouds**: See which words appear most often in your text
-   - **t-SNE Maps**: View how words relate to each other in 2D space
-   - **Word Relationship Heatmaps**: See which words appear together frequently
-   - **Semantic Networks**: Visualize connections between related words
+   - **t-SNE Maps**: View how words relate to each other in a scatter-plot-like visual
+   - **Word Relationship Heatmaps**: See which words cluster together 
+   - **Semantic Networks**: Visualize connections between related concepts
 
-4. **Code-Level Visualizations**:
-   - **Code Co-occurrence Heatmaps**: See which qualitative codes appear together
+Each of the above can be run for your full data, or on subsets (e.g. only interviews with one demographic group, only fieldnotes at a single-site). Examining multiple subsets can allow comparisons.
+
+5. **Code-Level Visualizations**:
+   - **Code Co-occurrence Heatmaps**: See which qualitative codes or tags appear together
    - **Code Networks**: Visualize relationships between different themes or codes
 
 All analysis happens on your computer - no data is sent anywhere else.
@@ -56,9 +58,17 @@ You can use this software with commercial qualitative data analysis by using the
 
 **⚠️ IMPORTANT**: This toolkit requires Anaconda or Miniconda to be installed on your system. If you don't have it yet, [download and install Anaconda](https://www.anaconda.com/products/distribution) or [download and install Miniconda](https://docs.conda.io/en/latest/miniconda.html) before proceeding.
 
-### One-Command Installation (Easiest Method)
+### Initial Installation (Easiest Method)
 
 For the simplest installation, follow these steps:
+
+**If you are using anaconda:**
+  -  Left-click 'Environments' (left side of the interface)
+  -  Left-click (left click the arrow next to base(root)-> cick open terminal.
+  -  In the terminal window that opens, cut and paste the text in steps 1-3.
+    -   Make sure to use the version for your system (windows, mac, or linux)
+    -   Note: some windows versions require pasting by right-clicking
+
 
 1. **Clone the repository**:
    ```bash
@@ -69,20 +79,21 @@ For the simplest installation, follow these steps:
 When prompted by GitHub:
 
 - **Username:** Enter your GitHub username (e.g., `your-username`).  
-- **Password:** This is **not your GitHub login password**. GitHub now requires a **Personal Access Token (PAT)** instead.  
-
+- **Password:** This is **not your GitHub login password**. GitHub now requires a **Personal Access Token (PAT)** instead.
+  
 **How to get a Personal Access Token (PAT):**
 
 - Log into [GitHub](https://github.com).  
 - Go to **Settings -> Developer settings -> Personal access tokens -> Tokens (classic)**.  
 - Click **Generate new token (classic)**, give it a name, set an expiration, and check the box for `repo`.  
-- Copy the generated token (you will only see it once).  
+- Copy the generated token and save it somewhere, like in apple notes or a .txt file (you will only see it once).  
 - When Git asks for your password, paste this token.  
 
-> **Tip:** To avoid typing your PAT every time, you can save it using Git Credential Manager or macOS Keychain.
+> **Tip:** To avoid typing your PAT every time, you can save it using Git Credential Manager or macOS Keychain. When asked by your operating system, select credential manager or web login.
 
 2. **Run the installation script**:
-
+- This sets up the python packages needed to run the toolkit.
+  
    **For macOS/Linux**:
    ```bash
    chmod +x install.sh
@@ -97,7 +108,7 @@ When prompted by GitHub:
    python -c "import nltk; nltk.download('punkt'); nltk.download('stopwords'); nltk.download('wordnet'); nltk.download('averaged_perceptron_tagger'); print('NLTK resources downloaded successfully!')"
    ```
 
-3. **Launch Jupyter Notebook**:
+4. **Launch Jupyter Notebook**:
    ```bash
    jupyter notebook visualization_toolkit_final.ipynb
    ```
@@ -308,7 +319,7 @@ schema = {
 **Critical Fields**:
 - `text`: Main content field - cannot be empty
 - `document`: Source information - cannot be empty
-- `codes`: Required for code-based analyses - must be a list of strings
+- `codes`: Required for code-based analyses - must be a list of strings if used
 
 **Important Notes**:
 - Lists (like `codes` and `data_group`) must be proper Python lists, not strings that look like lists
