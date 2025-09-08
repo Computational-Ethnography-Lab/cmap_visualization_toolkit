@@ -301,7 +301,7 @@ To analyze your own text data:
 
 ### Data Structure
 
-For technically minded users, here's the complete schema for data files:
+For technically minded users, here's the complete schema for data files (See Abramson et al. 2025):
 
 ```python
 # Updated schema with Python typing
@@ -320,6 +320,28 @@ schema = {
     "doc_id": str,          # Optional: NLP info, unique paragrah level identifier
     "codes": list[str]      # Critical for analyses with codes, Must be a list of strings
 }
+```
+```
+  example (simulated, not actual data):
+  {
+    "project": "engineer_interviews",  
+    "number": "675:113" #For reconstructing with QDA software  
+    "reference": 244 #For reconstructing with QDA software  
+    "text": "EG002: So the thing is..." # Actual paragraph level text,
+    "document": "INTV_EG002_20250801.txt" # name of document, in which text is found
+    "start_position": 244 #For reconstructing with QDA software  
+    "end_position": 248 #For reconstructing with QDA software  
+    "data_group": ["data_type_cg_interviews","interview"] # For subsetting by data type, or characteristic
+    "text_length": 441 # nlp
+    "word_count": 82 # nlp
+    "doc_id": "EG002_76426", #unique ID for text segment in file, to reconstruct or link to raw data, sequential
+    "codes": ["narrative_life", "education_perceptions"] # qualitative codes, for concepts, themes, variables
+    "old_codes": [
+      "science_belief",
+      "subject_speech_all"
+    ] # qualitative codes, for concepts, themes, variables; archived to silo and reduce clutter
+
+  },//
 ```
 
 **Critical Fields**:
@@ -364,8 +386,6 @@ Here are solutions to common issues you might encounter:
    - If you see errors related to data types, ensure your CSV has the correct format per the schema
    - Common issue: Make sure `codes` and `data_group` are proper lists, not strings
    - Fix: Use `df['codes'] = df['codes'].apply(lambda x: ast.literal_eval(x) if isinstance(x, str) else x)` to convert string representations to lists
-
-For more detailed troubleshooting, please visit the [project website](https://computationalethnography.org/) or open an issue on the GitHub repository.
 
 ## Uninstallation
 
