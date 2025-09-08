@@ -63,11 +63,12 @@ You can use this software with commercial qualitative data analysis by using the
 For the simplest installation, follow these steps:
 
 **If you are using anaconda:**
+  -  Open the anaconda program
   -  Left-click 'Environments' (left side of the interface)
   -  Left-click (left click the arrow next to base(root)-> cick open terminal.
   -  In the terminal window that opens, cut and paste the text in steps 1-3.
     -   Make sure to use the version for your system (windows, mac, or linux)
-    -   Note: some windows versions require pasting by right-clicking
+      -   _Note: some windows versions require pasting by right-clicking instead of ctrl-v_
 
 
 1. **Clone the repository**:
@@ -89,7 +90,7 @@ When prompted by GitHub:
 - Copy the generated token and save it somewhere, like in apple notes or a .txt file (you will only see it once).  
 - When Git asks for your password, paste this token.  
 
-> **Tip:** To avoid typing your PAT every time, you can save it using Git Credential Manager or macOS Keychain. When asked by your operating system, select credential manager or web login.
+> **Tip:** To avoid typing your PAT every time, you can save it using Git Credential Manager or macOS Keychain. When asked by your operating system, select credential manager or web login. 
 
 2. **Run the installation script**:
 - This sets up the python packages needed to run the toolkit.
@@ -112,17 +113,20 @@ When prompted by GitHub:
    ```bash
    jupyter notebook visualization_toolkit_final.ipynb
    ```
+**Now, you should be in the toolkit! You can run each block by clicking the run buton (triangular arrow) for each cell. The program explains what each cell does, and what can be edited for analysis/**
 
 ### Step-by-Step Installation
 
-If the one-command method doesn't work, try these step-by-step commands:
+If the one-command method doesn't work, or you want more granular control at the command line, try these step-by-step commands:
+
+First, open your terminal. Then paste the following into the command line interface in order.
 
 ```bash
 # 1. Clone the repository
 git clone https://github.com/Computational-Ethnography-Lab/cmap_visualization_toolkit.git
 cd cmap_visualization_toolkit
 
-# 2. Create and activate conda environment
+# 2. Create and activate conda environment (assuming a conda version)
 conda create -y --name cmap_visualization_toolkit python=3.11
 conda activate cmap_visualization_toolkit
 
@@ -137,6 +141,8 @@ python -c "import nltk; nltk.download('punkt'); nltk.download('stopwords'); nltk
 
 # 6. Launch Jupyter Notebook
 jupyter notebook visulization_toolkit_final.ipynb
+
+# 6b. If you would rather use VS code or another integrated development enviornment, simply open the .ipynb file in that application.
 ```
 
 This installation method ensures all packages are installed with the correct versions specified in the `requirements.txt` file.
@@ -257,8 +263,8 @@ For users who prefer a visual interface:
 ### Regular Usage
 
 1. **Start Your Environment**:
-   - Using Navigator: Open Anaconda Navigator, click your environment, then click "▶" and "Open Terminal"
-   - Using command line: Open terminal and type `conda activate cmap_visualization_toolkit`
+   - IF using Navigator: Open Anaconda Navigator, click your environment, then click "▶" and "Open Terminal"
+   - IF using command line: Open terminal and type `conda activate cmap_visualization_toolkit`, and switch to the directory with the toolkid 'cd cmap_visualization_toolkit'
 
 2. **Open the Notebook**:
    ```bash
