@@ -108,7 +108,7 @@ When prompted by GitHub:
    python -c "import nltk; nltk.download('punkt'); nltk.download('stopwords'); nltk.download('wordnet'); nltk.download('averaged_perceptron_tagger'); print('NLTK resources downloaded successfully!')"
    ```
 
-4. **Launch Jupyter Notebook**:
+3. **Launch Jupyter Notebook**:
    ```bash
    jupyter notebook visualization_toolkit_final.ipynb
    ```
