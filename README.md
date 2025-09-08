@@ -122,13 +122,14 @@ If the one-command method doesn't work, or you want more granular control at the
 First, open your terminal. Then paste the following into the command line interface in order.
 
 ```bash
-# 1. Clone the repository
-git clone https://github.com/Computational-Ethnography-Lab/cmap_visualization_toolkit.git
-cd cmap_visualization_toolkit
-
-# 2. Create and activate conda environment (assuming a conda version)
+# 1. Create and activate conda environment (assuming a conda version)
 conda create -y --name cmap_visualization_toolkit python=3.11
 conda activate cmap_visualization_toolkit
+conda install git
+
+# 2. Clone the repository
+git clone https://github.com/Computational-Ethnography-Lab/cmap_visualization_toolkit.git
+cd cmap_visualization_toolkit
 
 # 3. Install Jupyter (to ensure we have it before other packages)
 conda install -y jupyter
