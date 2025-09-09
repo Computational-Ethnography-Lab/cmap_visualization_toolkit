@@ -1022,10 +1022,10 @@ def plot_heatmap(clustering_method, word_embeddings, similarity_matrix, co_occur
     elif clustering_method in [2, 3, 4]:
         if distance_metric == "cosine" and similarity_matrix is not None:
             matrix = similarity_matrix
-            title = f"{METHOD_NAMES[clustering_method]} Context Cosine Similarity"
+            title = "Context Cosine Similarity"
         elif distance_metric == "default" and co_occurrence_matrix is not None:
             matrix = co_occurrence_matrix
-            title = METHOD_NAMES[clustering_method] + " Co-occurrence"
+            title = "Co-Occurrence"
         else:
             print("Error: No valid matrix available.")
             return
@@ -1058,14 +1058,14 @@ def plot_heatmap(clustering_method, word_embeddings, similarity_matrix, co_occur
     ax1 = fig.add_subplot(gs[0])
     sns.heatmap(similarity_df, annot=True, fmt='.2f', cmap='inferno', ax=ax1,
             annot_kws={"size": 8}, cbar_kws={"shrink": 0.5})
-    ax1.set_title("Heatmap (Unclustered)")
+    ax1.set_title(f"{title} Heatmap (Non-Clustered, {METHOD_NAMES[clustering_method]})")
 
     # Clustered Heatmap 
     ax2 = fig.add_subplot(gs[1])
     img = mpimg.imread("clustermap_temp.png")
     ax2.imshow(img)
     ax2.axis('off')
-    ax2.set_title("Heatmap (Clustered)")
+    ax2.set_title(f"{title} Heatmap (Clustered, {METHOD_NAMES[clustering_method]})")
 
     plt.tight_layout()
     
