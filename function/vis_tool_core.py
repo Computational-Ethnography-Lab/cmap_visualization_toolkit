@@ -1047,7 +1047,7 @@ def plot_heatmap(clustering_method, word_embeddings, similarity_matrix, co_occur
                          dendrogram_ratio=(0.1, 0.1),
                          cbar_pos=(0.02, 0.8, 0.03, 0.18))
 
-    cluster.fig.suptitle(f"{title} Heatmap (Clustered)", y=1.02)
+    # Don't add title here as we'll add it when displaying the image
     cluster.savefig("clustermap_temp.png")  
     plt.close(cluster.fig)  
 
@@ -1058,14 +1058,14 @@ def plot_heatmap(clustering_method, word_embeddings, similarity_matrix, co_occur
     ax1 = fig.add_subplot(gs[0])
     sns.heatmap(similarity_df, annot=True, fmt='.2f', cmap='inferno', ax=ax1,
             annot_kws={"size": 8}, cbar_kws={"shrink": 0.5})
-    ax1.set_title(f"{title} Heatmap (Non-Clustered)")
+    ax1.set_title("Heatmap (Unclustered)")
 
     # Clustered Heatmap 
     ax2 = fig.add_subplot(gs[1])
     img = mpimg.imread("clustermap_temp.png")
     ax2.imshow(img)
     ax2.axis('off')
-    ax2.set_title(f"{title} Heatmap (Clustered)")
+    ax2.set_title("Heatmap (Clustered)")
 
     plt.tight_layout()
     
