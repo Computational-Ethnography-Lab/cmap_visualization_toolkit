@@ -148,7 +148,8 @@ __marimo__/
 !README.md
 !visualization_toolkit_final.ipynb
 !LICENSE.md
-!clustermap_temp.png
+# PNG files are now ignored
+*.png
 !environment.yml
 !install.sh
 !requirements.txt
