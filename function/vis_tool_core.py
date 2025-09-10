@@ -1058,14 +1058,14 @@ def plot_heatmap(clustering_method, word_embeddings, similarity_matrix, co_occur
     ax1 = fig.add_subplot(gs[0])
     sns.heatmap(similarity_df, annot=True, fmt='.2f', cmap='inferno', ax=ax1,
             annot_kws={"size": 8}, cbar_kws={"shrink": 0.5})
-    ax1.set_title(f"{title} Heatmap (Non-Clustered, {METHOD_NAMES[clustering_method]})")
+    ax1.set_title("Heatmap (unclustered)")
 
     # Clustered Heatmap 
     ax2 = fig.add_subplot(gs[1])
     img = mpimg.imread("clustermap_temp.png")
     ax2.imshow(img)
     ax2.axis('off')
-    ax2.set_title(f"{title} Heatmap (Clustered, {METHOD_NAMES[clustering_method]})")
+    ax2.set_title("Heatmap (clustered)")
 
     plt.tight_layout()
     
