@@ -716,7 +716,9 @@ def train_embedding(sentences, context_window, stop_list, seed_words, clustering
     cross_pos_normalize : bool
         Whether to normalize across parts of speech
     distance_metric : str
-        "default" or "cosine"
+        "default" = cosine similarity (same as "cosine")
+        "cosine" = cosine similarity between context vectors  
+        "raw_weighted" = raw weighted co-occurrence scores
     custom_word_filter : function
         Optional function to filter words
         
@@ -955,7 +957,12 @@ def train_embedding(sentences, context_window, stop_list, seed_words, clustering
 
     elif clustering_method == 4:  # TF-IDF weighted co-occurrence
 
-        if distance_metric == "cosine":
+        if distance_metric == "raw_weighted":
+            # Original TF-IDF implementation with raw weighted scores
+            print(f"Computing raw weighted co-occurrence for TF-IDF context window using {distance_metric} metric...")
+            return run_tfidf_overlap(processed_sentences, selected_words, context_window, all_candidates, cache_file)
+        else:
+            # Both "default" and "cosine" use cosine similarity
             print(f"Computing cosine similarity for TF-IDF context window using {distance_metric} metric...")
             vectors = build_tfidf_vectors(processed_sentences, selected_words, all_candidates, context_window)
             similarity_matrix = compute_cosine_similarity_matrix(vectors, selected_words)
@@ -967,10 +974,6 @@ def train_embedding(sentences, context_window, stop_list, seed_words, clustering
                 pickle.dump((filtered_embeddings, similarity_matrix, None), f)
             
             return filtered_embeddings,similarity_matrix, None
-        else:
-            # Original TF-IDF implementation
-            print(f"Computing co-occurrence for TF-IDF context window using {distance_metric} metric...")
-            return run_tfidf_overlap(processed_sentences, selected_words, context_window, all_candidates, cache_file)
 
     else:
         print("Invalid clustering method. Choose 1 (RoBERTa), 2 (Jaccard), 3 (PMI), or 4 (TF-IDF).")
@@ -1020,7 +1023,10 @@ def plot_heatmap(clustering_method, word_embeddings, similarity_matrix, co_occur
         matrix = similarity_matrix
         title = "RoBERTa Word Similarity"
     elif clustering_method in [2, 3, 4]:
-        if distance_metric == "cosine" and similarity_matrix is not None:
+        if distance_metric == "raw_weighted" and co_occurrence_matrix is not None:
+            matrix = co_occurrence_matrix
+            title = "Raw Weighted Co-Occurrence"
+        elif distance_metric == "cosine" and similarity_matrix is not None:
             matrix = similarity_matrix
             title = "Context Cosine Similarity"
         elif distance_metric == "default" and co_occurrence_matrix is not None:
@@ -1120,7 +1126,9 @@ def plot_tsne_dimensional_reduction(
     if clustering_method == 1 and similarity_matrix is not None:
         matrix = similarity_matrix
     elif clustering_method in (2, 3, 4):
-        if distance_metric == "cosine" and similarity_matrix is not None:
+        if distance_metric == "raw_weighted" and co_occurrence_matrix is not None:
+            matrix = co_occurrence_matrix
+        elif distance_metric == "cosine" and similarity_matrix is not None:
             matrix = similarity_matrix
         elif distance_metric == "default" and co_occurrence_matrix is not None:
             matrix = co_occurrence_matrix
@@ -1360,23 +1368,23 @@ def plot_semantic_network(word_embeddings, seed_words, clustering_method,
             return
 
     elif clustering_method == 4:
-        if distance_metric == "cosine" and similarity_matrix is not None: # TF-IDF cosine
-            for i, word1 in enumerate(words):
-                for j, word2 in enumerate(words):
-                    if i != j:
-                        similarity = similarity_matrix[i][j]
-                        if similarity > 0.1:
-                            G.add_edge(word1, word2, weight=similarity)
-            raw_weights = [G[u][v]['weight'] for u, v in G.edges()]
-            edge_weights = normalize_edge_weights(raw_weights, scale=7.0, base=0.5)
-        
-        elif distance_metric == "default" and co_occurrence_matrix is not None:  # TF-IDF Co-occurrence 
+        if distance_metric == "raw_weighted" and co_occurrence_matrix is not None:  # TF-IDF raw weighted 
             for i, word1 in enumerate(words):
                 for j, word2 in enumerate(words):
                     if i != j:
                         cosine_score = co_occurrence_matrix[i][j]
                         if cosine_score > 0.2:
                             G.add_edge(word1, word2, weight=cosine_score)
+            raw_weights = [G[u][v]['weight'] for u, v in G.edges()]
+            edge_weights = normalize_edge_weights(raw_weights, scale=7.0, base=0.5)
+        
+        elif (distance_metric in ["default", "cosine"]) and similarity_matrix is not None: # TF-IDF cosine
+            for i, word1 in enumerate(words):
+                for j, word2 in enumerate(words):
+                    if i != j:
+                        similarity = similarity_matrix[i][j]
+                        if similarity > 0.1:
+                            G.add_edge(word1, word2, weight=similarity)
             raw_weights = [G[u][v]['weight'] for u, v in G.edges()]
             edge_weights = normalize_edge_weights(raw_weights, scale=7.0, base=0.5)
         else:
@@ -2172,10 +2180,10 @@ def run_visuals_pipeline(input_data):
         elif input_data.distance_metric == "default":
             print("Method: PMI (default) – Highlights statistically significant word associations using raw PMI scores")
     elif input_data.clustering_method == 4:
-        if input_data.distance_metric == "cosine":
+        if input_data.distance_metric == "raw_weighted":
+            print("Method: TF-IDF (raw weighted) – Uses raw TF-IDF-weighted co-occurrence scores for word associations")
+        else:  # Both "default" and "cosine"
             print("Method: TF-IDF (cosine) – Uses TF-IDF-weighted context vectors to compute cosine similarity between words")
-        elif input_data.distance_metric == "default":
-            print("Method: TF-IDF (default) – Uses raw TF-IDF-weighted co-occurrence scores for word associations")
 
 # STOP Programs
 
