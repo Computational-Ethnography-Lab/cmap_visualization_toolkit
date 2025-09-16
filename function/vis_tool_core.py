@@ -338,55 +338,56 @@ def run_jaccard(sentences, selected_words, context_window, all_candidates, cache
         pickle.dump((filtered_embeddings, None, jaccard_matrix), f)
     return filtered_embeddings, None, jaccard_matrix
 
-def run_pmi(sentences, selected_words, context_window, all_candidates, cache_file): # Get PMI co-occurrence matrix 
-    
-    """ 
-    Compute a Pointwise Mutual Information (PMI) similarity matrix for selected words
-    based on co-occurrence within a sliding context window.
-    """
 
+def run_pmi(sentences, selected_words, context_window, cache_file, epsilon=1e-9):
+    """
+    Compute a Positive PMI (PPMI) square matrix: seed_words × seed_words
+    """
     cooc_matrix = np.zeros((len(selected_words), len(selected_words)))
     word_counts = Counter()
+    total_windows = 0
+
     for sent in sentences:
         for i, word1 in enumerate(sent):
             if word1 not in selected_words:
                 continue
             word_counts[word1] += 1
-            window = sent[max(0, i - context_window):i + context_window + 1]
+            window = sent[max(0, i - context_window): i + context_window + 1]
             for word2 in window:
-                if word2 != word1 and word2 in selected_words:
+                if word2 in selected_words and word2 != word1:
                     idx1, idx2 = selected_words.index(word1), selected_words.index(word2)
-                    cooc_matrix[idx1][idx2] += 1
-    total_cooc = np.sum(cooc_matrix)
-    if total_cooc == 0:
+                    cooc_matrix[idx1, idx2] += 1
+                    total_windows += 1
+
+    if total_windows == 0:
         warnings.warn("No co-occurrences found. Returning empty results.")
-        return None, None, None
-    word_freqs = np.array([word_counts[word] for word in selected_words])
-    pmi_matrix = np.zeros_like(cooc_matrix)
-    epsilon = 1e-10
-    for i in range(len(selected_words)):
-        for j in range(len(selected_words)):
-            if cooc_matrix[i][j] > 0:
-                p_ij = max(cooc_matrix[i][j], epsilon) / total_cooc
-                p_i = max(word_freqs[i], epsilon) / total_cooc
-                p_j = max(word_freqs[j], epsilon) / total_cooc
-                pmi = np.log2(p_ij / (p_i * p_j))
-                if np.isfinite(pmi):
-                    pmi_matrix[i][j] = max(pmi, 0)
+        return {}, None, np.zeros((len(selected_words), len(selected_words)))
+
+    # ---- compute PPMI ----
+    pmi_matrix = np.zeros_like(cooc_matrix, dtype=float)
+    for i, w1 in enumerate(selected_words):
+        for j, w2 in enumerate(selected_words):
+            if cooc_matrix[i, j] > 0:
+                p_ij = cooc_matrix[i, j] / total_windows
+                p_i = word_counts[w1] / total_windows
+                p_j = word_counts[w2] / total_windows
+                if p_i > 0 and p_j > 0:
+                    pmi = np.log2(p_ij / (p_i * p_j + epsilon))
+                    pmi_matrix[i, j] = max(0, pmi)  # PPMI
+
     filtered_embeddings = {selected_words[i]: pmi_matrix[i] for i in range(len(selected_words))}
-    with open(cache_file, 'wb') as f:
+    with open(cache_file, "wb") as f:
         pickle.dump((filtered_embeddings, None, pmi_matrix), f)
+
     return filtered_embeddings, None, pmi_matrix
 
 def run_tfidf_overlap(sentences, selected_words, context_window, all_candidates, cache_file): # Get TF-IDF co-occurrnece matrix 
-    """ 
-    Compute a TF-IDF weighted co-occurrence matrix for selected words.
-
-    For each pair of words (word1, word2), we collect their context windows across
-    the input sentences, identify overlapping context tokens, and weight those overlaps
-    using their global TF-IDF scores. This produces a matrix where higher values indicate
-    stronger co-occurrence weighted by term importance.
     """
+    Calculates similarity based on TF-IDF vectors of context windows.
+    The primary and recommended method is 'cosine' similarity.
+    The 'experimental_unnormalized_sum' is retained for legacy purposes but is not recommended.
+    """
+
     docs = [" ".join(sent) for sent in sentences]
     vectorizer = TfidfVectorizer()
     tfidf_matrix_raw = vectorizer.fit_transform(docs)
@@ -950,20 +951,12 @@ def train_embedding(sentences, context_window, stop_list, seed_words, clustering
             with open(cache_file, 'wb') as f:
                 pickle.dump((filtered_embeddings, similarity_matrix, None), f)
             return filtered_embeddings, similarity_matrix, None
-        else:
-            # Original PMI implementation
-            print(f"Computing co-occurrence for PMI context window using {distance_metric} metric...")
-            return run_pmi(processed_sentences, selected_words, context_window, all_candidates, cache_file)
+    
 
     elif clustering_method == 4:  # TF-IDF weighted co-occurrence
 
-        if distance_metric == "raw_weighted":
-            # Original TF-IDF implementation with raw weighted scores
-            print(f"Computing raw weighted co-occurrence for TF-IDF context window using {distance_metric} metric...")
-            return run_tfidf_overlap(processed_sentences, selected_words, context_window, all_candidates, cache_file)
-        else:
-            # Both "default" and "cosine" use cosine similarity
-            print(f"Computing cosine similarity for TF-IDF context window using {distance_metric} metric...")
+        if distance_metric in {'cosine', 'default'}:
+            print(f"Computing cosine similarity for TF-IDF context window using cosine metric...")
             vectors = build_tfidf_vectors(processed_sentences, selected_words, all_candidates, context_window)
             similarity_matrix = compute_cosine_similarity_matrix(vectors, selected_words)
             # Create word embeddings from TF-IDF weighted cosine similarity matrix
@@ -974,6 +967,13 @@ def train_embedding(sentences, context_window, stop_list, seed_words, clustering
                 pickle.dump((filtered_embeddings, similarity_matrix, None), f)
             
             return filtered_embeddings,similarity_matrix, None
+        else:
+            # Original TF-IDF implementation
+            print(f"Computing co-occurrence for TF-IDF context window using {distance_metric} metric...")
+            print("WARNING: You are using the 'experimental_unnormalized_sum' metric for TF-IDF. "
+              "This is an unnormalized, non-standard method. For scientifically valid results, "
+              "it is strongly recommended to use distance_metric='cosine'.")
+            return run_tfidf_overlap(processed_sentences, selected_words, context_window, all_candidates, cache_file)
 
     else:
         print("Invalid clustering method. Choose 1 (RoBERTa), 2 (Jaccard), 3 (PMI), or 4 (TF-IDF).")
@@ -1022,27 +1022,42 @@ def plot_heatmap(clustering_method, word_embeddings, similarity_matrix, co_occur
     if clustering_method == 1 and similarity_matrix is not None:
         matrix = similarity_matrix
         title = "RoBERTa Word Similarity"
-    elif clustering_method in [2, 3, 4]:
-        if distance_metric == "raw_weighted" and co_occurrence_matrix is not None:
-            matrix = co_occurrence_matrix
-            title = "Raw Weighted Co-Occurrence"
-        elif distance_metric == "cosine" and similarity_matrix is not None:
+    elif clustering_method == 2:  # Jaccard
+        if distance_metric == "cosine" and similarity_matrix is not None:
             matrix = similarity_matrix
-            title = "Context Cosine Similarity"
+            title = "Jaccard (Context Cosine Similarity)"
         elif distance_metric == "default" and co_occurrence_matrix is not None:
             matrix = co_occurrence_matrix
-            title = "Co-Occurrence"
+            title = "Jaccard (Co-Occurrence)"
+        else:
+            print("Error: No valid matrix available for Jaccard.")
+            return
+
+    elif clustering_method == 3:  # PMI
+        if distance_metric == "cosine" and similarity_matrix is not None:
+            matrix = similarity_matrix
+            title = "PMI (Context Cosine Similarity)"
+        else:
+            print("Error: PMI currently only supports cosine similarity.")
+            return
+            
+    elif clustering_method == 4:
+        if distance_metric in {'cosine', 'default'} and similarity_matrix is not None:
+            matrix = similarity_matrix 
+            title = "Context Cosine Similarity" 
+        elif distance_metric == 'raw_weighted' and co_occurrence_matrix is not None:
+            matrix = co_occurrence_matrix 
+            title = "Co-Occurrence (Experimental Unnormalized Sum)"
         else:
             print("Error: No valid matrix available.")
             return
-
     else:
         print("Error: Invalid matrix input or clustering method.")
         return
 
-    similarity_df = pd.DataFrame(matrix, index=words, columns=words)
+    matched_df = pd.DataFrame(matrix, index=words, columns=words)
 
-    cluster = sns.clustermap(similarity_df,
+    cluster = sns.clustermap(matched_df,
                          annot=True,
                          fmt='.2f',
                          cmap='inferno',
@@ -1053,7 +1068,6 @@ def plot_heatmap(clustering_method, word_embeddings, similarity_matrix, co_occur
                          dendrogram_ratio=(0.1, 0.1),
                          cbar_pos=(0.02, 0.8, 0.03, 0.18))
 
-    # Don't add title here as we'll add it when displaying the image
     cluster.savefig("clustermap_temp.png")  
     plt.close(cluster.fig)  
 
@@ -1062,7 +1076,7 @@ def plot_heatmap(clustering_method, word_embeddings, similarity_matrix, co_occur
 
     # Non-clustered Heatmap 
     ax1 = fig.add_subplot(gs[0])
-    sns.heatmap(similarity_df, annot=True, fmt='.2f', cmap='inferno', ax=ax1,
+    sns.heatmap(matched_df, annot=True, fmt='.2f', cmap='inferno', ax=ax1,
             annot_kws={"size": 8}, cbar_kws={"shrink": 0.5})
     ax1.set_title("Heatmap (unclustered)")
 
@@ -1119,18 +1133,32 @@ def plot_tsne_dimensional_reduction(
     seed_words: list[str] | None
                            – words to highlight. If None a small default list
                              is used so the plot still renders.
-    distance_metric: str     "default" = co-occurrence | "cosine" = similarity from vectors
+    distance_metric: str     "default" = co-occurrence | "cosine" = similarity from vectors | "raw_weighted = raw weighted co-occurrence scores
     """
 
     # Choose clustering/embedding method
     if clustering_method == 1 and similarity_matrix is not None:
         matrix = similarity_matrix
-    elif clustering_method in (2, 3, 4):
-        if distance_metric == "raw_weighted" and co_occurrence_matrix is not None:
-            matrix = co_occurrence_matrix
-        elif distance_metric == "cosine" and similarity_matrix is not None:
+    elif clustering_method == 2:  # Jaccard
+        if distance_metric == "cosine" and similarity_matrix is not None:
             matrix = similarity_matrix
         elif distance_metric == "default" and co_occurrence_matrix is not None:
+            matrix = co_occurrence_matrix
+        else:
+            print("Error: missing matrix for Jaccard t-SNE visualisation.")
+            return
+
+    elif clustering_method == 3:  # PMI
+        if distance_metric == "cosine" and similarity_matrix is not None:
+            matrix = similarity_matrix
+        else:
+            print("Error: PMI currently only supports cosine similarity for t-SNE.")
+            return
+
+    elif clustering_method == 4:
+        if distance_metric in {'cosine','default'} and similarity_matrix is not None:
+            matrix = similarity_matrix
+        elif distance_metric == "raw_weighted" and co_occurrence_matrix is not None:
             matrix = co_occurrence_matrix
         else:
             print("Error: missing matrix for t-SNE visualisation.")
@@ -1247,7 +1275,7 @@ def plot_semantic_network(word_embeddings, seed_words, clustering_method,
     seed_words           : list[str]      words to highlight as central; required
     clustering_method    : int            1 = RoBERTa, 2 = Jaccard, 3 = PMI, 4 = TF-IDF
     similarity_matrix    : np.ndarray     optional; used when method = 1 or distance_metric = "cosine"
-    co_occurrence_matrix : np.ndarray     optional; used when method ∈ {2, 3, 4} and distance_metric = "default"
+    co_occurrence_matrix : np.ndarray     optional; used when method ∈ {2,3,4} and distance_metric = "default"
     semantic_categories  : dict | None    optional; word groupings with assigned colors
     link_threshold       : float | None   optional; minimum edge weight to include in plot
     link_color_threshold : float | None   optional; minimum edge weight to highlight as strong
@@ -1269,7 +1297,6 @@ def plot_semantic_network(word_embeddings, seed_words, clustering_method,
 
     node_colors, node_labels, node_color_dict, node_community_dict = [], {}, {}, {}
     used_categories = set()
-
     # ------------------------------------------------------------------ #
     # Node colours & community labels                                    #
     # ------------------------------------------------------------------ #
@@ -1308,6 +1335,7 @@ def plot_semantic_network(word_embeddings, seed_words, clustering_method,
 
     # edge construction (unchanged)   
     # Process edges with the same code as before
+
     if clustering_method == 1 and similarity_matrix is not None:  # RoBERTa similarity 
         for i, word1 in enumerate(words):
             for j, word2 in enumerate(words):
@@ -1352,39 +1380,28 @@ def plot_semantic_network(word_embeddings, seed_words, clustering_method,
                             G.add_edge(word1, word2, weight=similarity)
             raw_weights = [G[u][v]['weight'] for u, v in G.edges()]
             edge_weights = normalize_edge_weights(raw_weights, scale=7.0, base=0.5)
-
-        elif distance_metric == "default" and co_occurrence_matrix is not None: # PMI co-occurrence
-            for i, word1 in enumerate(words):
-                for j, word2 in enumerate(words):
-                    if i != j:
-                        pmi_score = co_occurrence_matrix[i][j]
-                        if pmi_score > 1: 
-                            G.add_edge(word1, word2, weight=pmi_score)
-            raw_weights = [G[u][v]['weight'] for u, v in G.edges()]
-            edge_weights = normalize_edge_weights(raw_weights, scale=7.0, base=0.5)
-
         else: 
             print("Error: No valid PMI matrix available.")
             return
 
     elif clustering_method == 4:
-        if distance_metric == "raw_weighted" and co_occurrence_matrix is not None:  # TF-IDF raw weighted 
-            for i, word1 in enumerate(words):
-                for j, word2 in enumerate(words):
-                    if i != j:
-                        cosine_score = co_occurrence_matrix[i][j]
-                        if cosine_score > 0.2:
-                            G.add_edge(word1, word2, weight=cosine_score)
-            raw_weights = [G[u][v]['weight'] for u, v in G.edges()]
-            edge_weights = normalize_edge_weights(raw_weights, scale=7.0, base=0.5)
-        
-        elif (distance_metric in ["default", "cosine"]) and similarity_matrix is not None: # TF-IDF cosine
+        if distance_metric in {"cosine",'default'} and similarity_matrix is not None: # TF-IDF cosine
             for i, word1 in enumerate(words):
                 for j, word2 in enumerate(words):
                     if i != j:
                         similarity = similarity_matrix[i][j]
                         if similarity > 0.1:
                             G.add_edge(word1, word2, weight=similarity)
+            raw_weights = [G[u][v]['weight'] for u, v in G.edges()]
+            edge_weights = normalize_edge_weights(raw_weights, scale=7.0, base=0.5)
+        
+        elif distance_metric == "raw_weighted" and co_occurrence_matrix is not None:  # TF-IDF Co-occurrence 
+            for i, word1 in enumerate(words):
+                for j, word2 in enumerate(words):
+                    if i != j:
+                        score = co_occurrence_matrix[i][j]
+                        if score > 0.2:
+                            G.add_edge(word1, word2, weight=score)
             raw_weights = [G[u][v]['weight'] for u, v in G.edges()]
             edge_weights = normalize_edge_weights(raw_weights, scale=7.0, base=0.5)
         else:
@@ -1398,7 +1415,7 @@ def plot_semantic_network(word_embeddings, seed_words, clustering_method,
     edge_list   = list(G.edges())
     raw_weights = [G[u][v]['weight'] for u,v in edge_list]
 
-    base_width  = 0.5 * 5                  
+    base_width  = 0.35 * 5                  
     min_width   = base_width * 0.1         
     max_width   = base_width * 3.0          
     edge_weights=[]
@@ -1579,7 +1596,7 @@ def plot_semantic_network(word_embeddings, seed_words, clustering_method,
                     strong_edge_weights.append(norm_weight)
 
     # drawing order
-    fig, ax = plt.subplots(figsize=(20,16))
+    fig, ax = plt.subplots(figsize=(18,14))
     fig.patch.set_facecolor('white') 
     ax.set_facecolor('white')
 
@@ -1612,7 +1629,7 @@ def plot_semantic_network(word_embeddings, seed_words, clustering_method,
                            (ctrl2_x,ctrl2_y),pv],
                           [Path.MOVETO,Path.CURVE4,Path.CURVE4,Path.CURVE4,Path.LINETO])
                 ax.add_patch(patches.PathPatch(path,fc='none',ec=edge_color,
-                                               lw=w,alpha=0.6,zorder=1))  # --- MOD z=1
+                                               lw=w*0.9,alpha=0.6,zorder=1))  # --- MOD z=1
         else:
             for idx,(u,v) in enumerate(edges):
                 w=edge_weights_by_community_diff[key][idx]
@@ -1625,10 +1642,10 @@ def plot_semantic_network(word_embeddings, seed_words, clustering_method,
                     path=Path([pu,(ctrl_x,ctrl_y),pv],
                               [Path.MOVETO,Path.CURVE3,Path.CURVE3])
                     ax.add_patch(patches.PathPatch(path,fc='none',ec=edge_color,
-                                                   lw=w,alpha=0.6,zorder=1))  # --- MOD z=1
+                                                   lw=w*0.9,alpha=0.6,zorder=1))  # --- MOD z=1
                 else:
                     ax.plot([pu[0],pv[0]],[pu[1],pv[1]],
-                            color=edge_color,lw=w,alpha=0.5,zorder=1)            # --- MOD z=1
+                            color=edge_color,lw=w*0.9,alpha=0.5,zorder=1)            # --- MOD z=1
 
     # intra-community (coloured) z=2 
     for key,edges in edges_by_community_same.items():
@@ -1646,10 +1663,10 @@ def plot_semantic_network(word_embeddings, seed_words, clustering_method,
                 path=Path([pu,(ctrl_x,ctrl_y),pv],
                           [Path.MOVETO,Path.CURVE3,Path.CURVE3])
                 ax.add_patch(patches.PathPatch(path,fc='none',ec=edge_color,
-                                               lw=w,alpha=0.5,zorder=2))   
+                                               lw=w*0.9,alpha=0.5,zorder=2))   
             else:
                 ax.plot([pu[0],pv[0]],[pu[1],pv[1]],
-                        color=edge_color,lw=w,alpha=0.5,zorder=2)            
+                        color=edge_color,lw=w*0.9,alpha=0.5,zorder=2)            
     # strong cross-community (black) z=3 
     # (logic unchanged – only ensure zorder=3)
     unique_edges,unique_w=[],[]
@@ -1666,7 +1683,7 @@ def plot_semantic_network(word_embeddings, seed_words, clustering_method,
         path=Path([pu,(ctrl_x,ctrl_y),pv],
                   [Path.MOVETO,Path.CURVE3,Path.CURVE3])
         ax.add_patch(patches.PathPatch(path,fc='none',ec='black',
-                                       lw=w*0.8,alpha=1.0,zorder=3))
+                                       lw=w*0.9,alpha=1.0,zorder=3))
     # Add numeric value close to the edge for all strong cross-community links
     for i,(u,v) in enumerate(unique_edges):
         w = unique_w[i]
@@ -1950,19 +1967,14 @@ def run_visuals_pipeline(input_data):
         min_word_frequency = input_data.min_word_frequency,
         reuse_clusterings  = input_data.reuse_clusterings,
         cross_pos_normalize= getattr(input_data, 'cross_pos_normalize', False),
-        distance_metric = getattr(input_data, 'distance_metric', 'default'),
+        distance_metric = input_data.distance_metric,
         custom_word_filter = custom_word_filter
     )
 
     elapsed_time = time.time() - start
-    print(f"Embedding generation completed in {elapsed_time:.1f} seconds")
 
-    if word_embeddings is None:
-        print("Error: Failed to generate embeddings. Please check your input data and parameters.")
-        return
-    # Plot Similarity Heatmap
-    
-    print("Plotting similarity heatmap...")
+    # Plot Heatmap
+    print("Plotting heatmap...")
     fig = plot_heatmap(
         input_data.clustering_method, word_embeddings, 
         similarity_matrix, co_occurrence_matrix, input_data.distance_metric
@@ -1986,7 +1998,7 @@ def run_visuals_pipeline(input_data):
             co_occurrence_matrix=co_occurrence_matrix,
             clustering_method=input_data.clustering_method,
             seed_words=seed_words, 
-            distance_metric=getattr(input_data, 'distance_metric', 'default')
+            distance_metric=input_data.distance_metric,
         )
     except Exception as e:
         print(f"t-SNE plot error: {e}")
@@ -2001,7 +2013,7 @@ def run_visuals_pipeline(input_data):
         semantic_categories=None,               
         link_threshold = input_data.link_threshold,
         link_color_threshold= input_data.link_color_threshold,
-        distance_metric=getattr(input_data, 'distance_metric', 'default'))
+        distance_metric=input_data.distance_metric)
     filename = f"semantic_network_plain_m{input_data.clustering_method}_{input_data.distance_metric}.png"
     os.makedirs(OUTPUT_DIR, exist_ok=True)
     out_path = os.path.join(OUTPUT_DIR, filename)
@@ -2031,7 +2043,7 @@ def run_visuals_pipeline(input_data):
             semantic_categories = input_data.semantic_categories,
             link_threshold     = input_data.link_threshold,
             link_color_threshold = input_data.link_color_threshold,
-            distance_metric=getattr(input_data, 'distance_metric', 'default')
+            distance_metric=input_data.distance_metric,
         )
         filename = f"semantic_network_customcolor_m{input_data.clustering_method}_{input_data.distance_metric}.png"
         os.makedirs(OUTPUT_DIR, exist_ok=True)
@@ -2078,7 +2090,7 @@ def run_visuals_pipeline(input_data):
             semantic_categories=None,
             link_threshold=input_data.link_threshold,
             link_color_threshold=input_data.link_color_threshold,
-            distance_metric=getattr(input_data, 'distance_metric', 'default')
+            distance_metric=input_data.distance_metric,
         )
         filename = f"semantic_network_noseeds_m{input_data.clustering_method}_{input_data.distance_metric}.png"
         out_path = os.path.join(OUTPUT_DIR, filename)
@@ -2101,7 +2113,7 @@ def run_visuals_pipeline(input_data):
                 semantic_categories=semantic_categories,
                 link_threshold=input_data.link_threshold,
                 link_color_threshold=input_data.link_color_threshold,
-                distance_metric=getattr(input_data, 'distance_metric', 'default')
+                distance_metric=input_data.distance_metric,
             )
             filename = f"semantic_network_noseeds_customcolor_m{input_data.clustering_method}_{input_data.distance_metric}.png"
             out_path = os.path.join(OUTPUT_DIR, filename)
@@ -2177,13 +2189,11 @@ def run_visuals_pipeline(input_data):
     elif input_data.clustering_method == 3:
         if input_data.distance_metric == "cosine":
             print("Method: PMI (cosine) – Highlights statistically significant word associations using cosine similarity of PMI-weighted context vectors")
-        elif input_data.distance_metric == "default":
-            print("Method: PMI (default) – Highlights statistically significant word associations using raw PMI scores")
     elif input_data.clustering_method == 4:
-        if input_data.distance_metric == "raw_weighted":
-            print("Method: TF-IDF (raw weighted) – Uses raw TF-IDF-weighted co-occurrence scores for word associations")
-        else:  # Both "default" and "cosine"
+        if input_data.distance_metric in {'cosine', 'default'}:
             print("Method: TF-IDF (cosine) – Uses TF-IDF-weighted context vectors to compute cosine similarity between words")
+        elif input_data.distance_metric == "raw_weighted":
+            print("Method: TF-IDF (raw weighted) – Uses raw TF-IDF-weighted co-occurrence scores for word associations")
 
 # STOP Programs
 
