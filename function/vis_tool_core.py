@@ -82,8 +82,6 @@ warnings.filterwarnings('ignore', category=UserWarning, module='tqdm')
 # Version Checks 
 IMPORT_NAME = {
     "python-dotenv": "dotenv",
-    # add others only if pip name ≠ import name
-    # e.g., "scikit-learn": "sklearn"
 }
 def _get_version(pkg_key: str):
     if pkg_key == "python":
@@ -675,11 +673,6 @@ def find_semantically_similar_words(seed_words, word_embeddings, threshold=0.7):
     similar_words = sorted(similar_words, key=lambda x: x[1], reverse=True)
     return similar_words
 
-
-# Loaded successfully message
-
-# ----------------------------------------------------------
-# Embedding and Clustering 
 #---------------------------------------------------------------------------------
 # EMBEDDING AND CLUSTERING FUNCTIONS
 #---------------------------------------------------------------------------------
@@ -850,7 +843,7 @@ def train_embedding(sentences, context_window, stop_list, seed_words, clustering
 
     if clustering_method == 1:  # RoBERTa token-based similarity
         print("Generating RoBERTa token-based embeddings...")
-        #######################
+ 
         # Load model and tokenizer
         tokenizer = TOKENIZER
         model = MODEL
@@ -977,9 +970,7 @@ def train_embedding(sentences, context_window, stop_list, seed_words, clustering
     else:
         print("Invalid clustering method. Choose 1 (RoBERTa), 2 (Co-occurrence), 3 (PMI), or 4 (TF-IDF).")
         return None, None, None
-#---------------------------------------------------------------------------------
-# Visualization 
-## Heatmap 
+
 #---------------------------------------------------------------------------------
 # VISUALIZATION FUNCTIONS: Heatmaps
 #---------------------------------------------------------------------------------
@@ -1105,7 +1096,6 @@ def plot_heatmap(clustering_method, word_embeddings, similarity_matrix, co_occur
 
     return fig
 
-## tSNE
 
 #---------------------------------------------------------------------------------
 # VISUALIZATION FUNCTIONS: t-SNE 
@@ -1255,8 +1245,7 @@ def plot_tsne_dimensional_reduction(
 
     print(f"t-SNE plot saved → {out_path}")
 
-    ## Semantic network 
-    #---------------------------------------------------------------------------------
+#---------------------------------------------------------------------------------
 # VISUALIZATION FUNCTIONS: Semantic Network
 #---------------------------------------------------------------------------------
 def plot_semantic_network(word_embeddings, seed_words, clustering_method,
@@ -1469,44 +1458,7 @@ def plot_semantic_network(word_embeddings, seed_words, clustering_method,
                    0.2*pos_initial[n][1]+0.8*community_pos[node_community_dict[n]][1])
                 for n in G.nodes()}
     
-    # # Ensure seed words are at least half the plot radius apart if there are two seed words:
-    # if has_seed_community and len(communities["Seed"]) == 2:
-    #     seed_words = communities["Seed"]
-    #     min_distance = radius / 2  # Half the plot radius
-    #     
-    #     # Calculate current distance between seed words
-    #     seed1, seed2 = seed_words[0], seed_words[1]
-    #     current_distance = np.hypot(
-    #         pos_adjusted[seed1][0] - pos_adjusted[seed2][0],
-    #         pos_adjusted[seed1][1] - pos_adjusted[seed2][1]
-    #     )
-    #     
-    #     # If seeds are too close, adjust their positions
-    #     if current_distance < min_distance:
-    #         # Calculate direction vector between seeds
-    #         dx = pos_adjusted[seed2][0] - pos_adjusted[seed1][0]
-    #         dy = pos_adjusted[seed2][1] - pos_adjusted[seed1][1]
-    #         
-    #         # Normalize direction vector
-    #         norm = np.hypot(dx, dy)
-    #         if norm > 0:
-    #             dx, dy = dx/norm, dy/norm
-    #         else:
-    #             dx, dy = 1, 0  # Default direction if seeds are at same position
-    #         
-    #         # Move seeds apart in opposite directions
-    #         adjustment = (min_distance - current_distance) / 2
-    #         pos_adjusted[seed1] = (
-    #             pos_adjusted[seed1][0] - dx * adjustment,
-    #             pos_adjusted[seed1][1] - dy * adjustment
-    #         )
-    #         pos_adjusted[seed2] = (
-    #             pos_adjusted[seed2][0] + dx * adjustment,
-    #             pos_adjusted[seed2][1] + dy * adjustment
-    #         )
-
-
-    # relationship repulsion          
+ 
     # simple intra-community repulsion (identical)
     def repel_nodes(p,iterations=150,k=0.2):
         for _ in range(iterations):
