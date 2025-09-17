@@ -441,7 +441,6 @@ def split_into_chunks(text, max_tokens=512):
     chunks = []
     current_chunk = []
     current_tokens = 0
-    semantic_categories=None,
     for sentence in sentences:
         sent_tokens = len(word_tokenize(sentence))
         if sent_tokens > max_tokens:
@@ -1330,8 +1329,10 @@ def plot_semantic_network(word_embeddings, seed_words, clustering_method,
                 
     print(f"seed words in lower",seed_words_lower)
     for word in words:
-        G.add_node(word, size=400 if word in seed_words else 100,
-                   community=node_community_dict[word])
+        w_lc = word.lower() # Get the lowercase version for dictionary lookups
+        is_seed = w_lc in seed_words_lower
+        G.add_node(word, size=400 if is_seed else 100,
+                       community=node_community_dict[w_lc]) #<-- FIXED: Use w_lc for lookup
 
     # edge construction (unchanged)   
     # Process edges with the same code as before
