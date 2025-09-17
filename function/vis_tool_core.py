@@ -314,9 +314,9 @@ def compute_cosine_similarity_matrix(word_vectors, word_list):
                 similarity_matrix[i][j] = cosine_similarity([v1], [v2])[0][0]
     return similarity_matrix
 
-def run_jaccard(sentences, selected_words, context_window, all_candidates, cache_file): # Get Jaccard similarity matrix 
-    """ 
-    Compute the Jaccard similarity matrix for selected words based on their surrounding context windows.
+def run_jaccard(sentences, selected_words, context_window, all_candidates, cache_file): # Get co-occurrence similarity matrix using Jaccard index                                                                                             
+    """
+    Compute the co-occurrence similarity matrix using the Jaccard index for selected words based on their surrounding context windows.
     """
     jaccard_matrix = np.zeros((len(selected_words), len(selected_words)))
     for i, word1 in enumerate(selected_words):
@@ -704,7 +704,7 @@ def train_embedding(sentences, context_window, stop_list, seed_words, clustering
     seed_words : list
         List of seed words to base similarity on
     clustering_method : int
-        1=RoBERTa embeddings, 2=Jaccard/Cosine, 3=PMI, 4=TF-IDF
+        1=RoBERTa embeddings, 2=Co-occurrence, 3=PMI, 4=TF-IDF
     num_words : int
         Number of words to include in the network
     lemmatize : bool
@@ -716,8 +716,8 @@ def train_embedding(sentences, context_window, stop_list, seed_words, clustering
     cross_pos_normalize : bool
         Whether to normalize across parts of speech
     distance_metric : str
-        "default" = cosine similarity (same as "cosine")
-        "cosine" = cosine similarity between context vectors  
+        "default" = context-window overlap measured by the Jaccard index (a set-based, binary overlap score)
+        "cosine" = building frequency-sensitive co-occurrence context vectors and comparing them with cosine similarity
         "raw_weighted" = raw weighted co-occurrence scores
     custom_word_filter : function
         Optional function to filter words
@@ -922,9 +922,9 @@ def train_embedding(sentences, context_window, stop_list, seed_words, clustering
 
         return filtered_embeddings, similarity_matrix, None
 
-    elif clustering_method == 2:  # Jaccard 
+    elif clustering_method == 2:  # Co-occurrence 
         if distance_metric == "cosine":
-            print(f"Computing cosine similarity for co-occurrence context window using {distance_metric} metric...")
+            print(f"Computing Co-occurrence with frequency-sensitive context vectors using cosine similarity...")
             vectors = build_context_vectors(processed_sentences, selected_words, all_candidates, context_window)
             similarity_matrix = compute_cosine_similarity_matrix(vectors, selected_words)
             filtered_embeddings = {w: similarity_matrix[i] for i, w in enumerate(selected_words)}
@@ -932,7 +932,7 @@ def train_embedding(sentences, context_window, stop_list, seed_words, clustering
                 pickle.dump((filtered_embeddings, similarity_matrix, None), f)
             return filtered_embeddings, similarity_matrix, None
         else:
-            print(f"Computing context-window overlap by Jaccard using {distance_metric} metric...")
+            print(f"Computing context-window overlap using the Jaccard index (set-based, binary overlap score)...")
             return run_jaccard(processed_sentences, selected_words, context_window, all_candidates, cache_file)
 
 
@@ -975,7 +975,7 @@ def train_embedding(sentences, context_window, stop_list, seed_words, clustering
             return run_tfidf_overlap(processed_sentences, selected_words, context_window, all_candidates, cache_file)
 
     else:
-        print("Invalid clustering method. Choose 1 (RoBERTa), 2 (Jaccard), 3 (PMI), or 4 (TF-IDF).")
+        print("Invalid clustering method. Choose 1 (RoBERTa), 2 (Co-occurrence), 3 (PMI), or 4 (TF-IDF).")
         return None, None, None
 #---------------------------------------------------------------------------------
 # Visualization 
@@ -992,11 +992,11 @@ def plot_heatmap(clustering_method, word_embeddings, similarity_matrix, co_occur
 
     Parameters
     ----------
-    clustering_method    : int     1 = RoBERTa, 2 = Jaccard, 3 = PMI, 4 = TF-IDF
+    clustering_method    : int     1 = RoBERTa, 2 = Co-occurrence, 3 = PMI, 4 = TF-IDF
     word_embeddings      : dict    keyed by word → vector (similarity or co-occurrence)
     similarity_matrix    : np.ndarray | None   used if clustering_method = 1 or distance_metric = "cosine"
     co_occurrence_matrix : np.ndarray | None   used if clustering_method in 2–4 and distance_metric = "default"
-    distance_metric      : str     "default" = co-occurrence | "cosine" = similarity from vectors
+    distance_metric      : str     "default" = context-window overlap measured by the Jaccard index | "cosine" = frequency-sensitive co-occurrence context vectors compared with cosine similarity
     clustered            : bool    if True, also shows a dendrogram-clustered version of the heatmap
 
     Returns
@@ -1014,22 +1014,22 @@ def plot_heatmap(clustering_method, word_embeddings, similarity_matrix, co_occur
     words = list(word_embeddings.keys())
     METHOD_NAMES = {
     1: "RoBERTa",
-    2: "Jaccard",
+    2: "Co-occurrence",
     3: "PMI",
     4: "TF-IDF"}
 
     if clustering_method == 1 and similarity_matrix is not None:
         matrix = similarity_matrix
         title = "RoBERTa Word Similarity"
-    elif clustering_method == 2:  # Jaccard
+    elif clustering_method == 2:  # Co-occurrence
         if distance_metric == "cosine" and similarity_matrix is not None:
             matrix = similarity_matrix
-            title = "Jaccard (Context Cosine Similarity)"
+            title = "Co-occurrence (Frequency-Sensitive Cosine Similarity)"
         elif distance_metric == "default" and co_occurrence_matrix is not None:
             matrix = co_occurrence_matrix
-            title = "Jaccard (Co-Occurrence)"
+            title = "Co-occurrence (Jaccard Index Overlap)"
         else:
-            print("Error: No valid matrix available for Jaccard.")
+            print("Error: No valid matrix available for Co-occurrence.")
             return
 
     elif clustering_method == 3:  # PMI
@@ -1128,11 +1128,11 @@ def plot_tsne_dimensional_reduction(
     word_embeddings: dict   keyed by word → embedding vector
     similarity_matrix: np.ndarray | None (used for RoBERTa = 1)
     co_occurrence_matrix: np.ndarray | None   (used for 2-4)
-    clustering_method: int     1 = RoBERTa, 2 = Jaccard, 3 = PMI, 4 = TF-IDF
+    clustering_method: int     1 = RoBERTa, 2 = Co-occurrence, 3 = PMI, 4 = TF-IDF
     seed_words: list[str] | None
                            – words to highlight. If None a small default list
                              is used so the plot still renders.
-    distance_metric: str     "default" = co-occurrence | "cosine" = similarity from vectors | "raw_weighted = raw weighted co-occurrence scores
+    distance_metric: str     "default" = context-window overlap measured by the Jaccard index | "cosine" = frequency-sensitive co-occurrence context vectors compared with cosine similarity | "raw_weighted = raw weighted co-occurrence scores
     """
 
     # Choose clustering/embedding method
@@ -1144,7 +1144,7 @@ def plot_tsne_dimensional_reduction(
         elif distance_metric == "default" and co_occurrence_matrix is not None:
             matrix = co_occurrence_matrix
         else:
-            print("Error: missing matrix for Jaccard t-SNE visualisation.")
+            print("Error: missing matrix for Co-occurrence t-SNE visualisation.")
             return
 
     elif clustering_method == 3:  # PMI
@@ -1272,7 +1272,7 @@ def plot_semantic_network(word_embeddings, seed_words, clustering_method,
     ----------
     word_embeddings      : dict           keyed by word → embedding vector or co-occurrence row
     seed_words           : list[str]      words to highlight as central; required
-    clustering_method    : int            1 = RoBERTa, 2 = Jaccard, 3 = PMI, 4 = TF-IDF
+    clustering_method    : int            1 = RoBERTa, 2 = Co-occurrence, 3 = PMI, 4 = TF-IDF
     similarity_matrix    : np.ndarray     optional; used when method = 1 or distance_metric = "cosine"
     co_occurrence_matrix : np.ndarray     optional; used when method ∈ {2,3,4} and distance_metric = "default"
     semantic_categories  : dict | None    optional; word groupings with assigned colors
@@ -1348,7 +1348,7 @@ def plot_semantic_network(word_embeddings, seed_words, clustering_method,
         edge_weights = normalize_edge_weights(raw_weights, scale=7.0, base=0.5)
 
     elif clustering_method == 2:
-        if distance_metric == "cosine" and similarity_matrix is not None: # Jaccard cosine
+        if distance_metric == "cosine" and similarity_matrix is not None: # Co-occurrence cosine
             for i, word1 in enumerate(words):
                 for j, word2 in enumerate(words):
                     if i != j:
@@ -1358,7 +1358,7 @@ def plot_semantic_network(word_embeddings, seed_words, clustering_method,
             raw_weights = [G[u][v]['weight'] for u, v in G.edges()]
             edge_weights = normalize_edge_weights(raw_weights, scale=7.0, base=0.5)
             
-        elif distance_metric == "default" and co_occurrence_matrix is not None:  # Jaccard co-occurrence
+        elif distance_metric == "default" and co_occurrence_matrix is not None:  # Co-occurrence with Jaccard index
             for i, word1 in enumerate(words):
                 for j, word2 in enumerate(words):
                     if i != j:
@@ -1368,7 +1368,7 @@ def plot_semantic_network(word_embeddings, seed_words, clustering_method,
             raw_weights = [G[u][v]['weight'] for u, v in G.edges()]
             edge_weights = normalize_edge_weights(raw_weights, scale=7.0, base=0.5)
         else: 
-            print("Error: No valid Jaccard matrix available.")
+            print("Error: No valid Co-occurrence matrix available.")
             return
 
     elif clustering_method == 3:
@@ -1954,7 +1954,7 @@ def run_visuals_pipeline(input_data):
     # choose context source: keep stop-words only for RoBERTa
     if input_data.clustering_method == 1:          # 1 = RoBERTa
         sentences_for_embedding = sentences        # full context
-    else:                                          # 2-4 = Jaccard/PMI/TF-IDF
+    else:                                          # 2-4 = Co-occurrence/PMI/TF-IDF
         sentences_for_embedding = filtered_sentences
 
     word_embeddings, similarity_matrix, co_occurrence_matrix = train_embedding(
@@ -2184,9 +2184,9 @@ def run_visuals_pipeline(input_data):
         print("Method: RoBERTa – Shows semantic relationships based on contextual embeddings")
     elif input_data.clustering_method == 2:
         if input_data.distance_metric == "cosine":
-            print("Method: Jaccard (cosine) – Uses context window vectors to compute cosine-based similarity between word usage patterns")
+            print("Method: Co-occurrence (cosine) – Building frequency-sensitive co-occurrence context vectors and comparing them with cosine similarity")
         elif input_data.distance_metric == "default":
-            print("Method: Jaccard (default) – Uses binary co-occurrence counts within a context window to capture word overlap")
+            print("Method: Co-occurrence (Jaccard) – Context-window overlap measured by the Jaccard index (a set-based, binary overlap score)")
     elif input_data.clustering_method == 3:
         if input_data.distance_metric == "cosine":
             print("Method: PMI (cosine) – Highlights statistically significant word associations using cosine similarity of PMI-weighted context vectors")
