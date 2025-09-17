@@ -17,6 +17,7 @@ dependencies:
   - dash>=2.10,<3
   - joblib>=1.2,<2
   - tqdm>=4.65,<5
+  - packaging>=20.0
   - pip>=22.0.0
   - pip:
     - sentence-transformers>=2.2,<3.6
@@ -26,4 +27,3 @@ dependencies:
     - dill>=0.3.6,<0.4
     - python-dotenv>=0.15,<2
     - pydantic>=1.10,<3
-    - nbimporter
