@@ -77,20 +77,6 @@ For the simplest installation, follow these steps:
    cd cmap_visualization_toolkit
    ```
    
-When prompted by GitHub:
-
-- **Username:** Enter your GitHub username (e.g., `your-username`).  
-- **Password:** This is **not your GitHub login password**. GitHub now requires a **Personal Access Token (PAT)** instead.
-  
-**How to get a Personal Access Token (PAT):**
-
-- Log into [GitHub](https://github.com).  
-- Go to **Settings -> Developer settings -> Personal access tokens -> Tokens (classic)**.  
-- Click **Generate new token (classic)**, give it a name, set an expiration, and check the box for `repo`.  
-- Copy the generated token and save it somewhere, like in apple notes or a .txt file (you will only see it once).  
-- When Git asks for your password, paste this token.  
-
-> **Tip:** To avoid typing your PAT every time, you can save it using Git Credential Manager or macOS Keychain. When asked by your operating system, select credential manager or web login. 
 
 2. **Run the installation script**:
 - This sets up the python packages needed to run the toolkit.
@@ -114,6 +100,9 @@ When prompted by GitHub:
    jupyter notebook visualization_toolkit_final.ipynb
    ```
 **Now, you should be in the toolkit! You can run each block by clicking the run buton (triangular arrow) for each cell. The program explains what each cell does, and what can be edited for analysis/**
+
+**If you get 'unable to compare versions error' check the kernel, in the top right. It should say something like visualization toolkit."
+** You can also open the .ipynb file in vscode or another development environment, just check the kernel**
 
 ### Step-by-Step Installation
 
