@@ -25,34 +25,81 @@ An easy-to-use toolkit for visualizing patterns in qualitative data, helping res
 - [Disclosure](#disclosure)
 
 ## Overview
+The CMAP Visualization Toolkit offers a free suite of open-source tools to analyze and visualize text data: including fieldnotes, in-depth interview transcripts, historical documents, web-pages, and other forms of non-numeric information. It is designed for scholars working with qualitative methods, who have an interest in the possibilities for pattern analysis, data visualization, and identifying alternative explanations found in computational social science's (CSS).
 
-The CMAP Visualization Toolkit helps you examine patterns in text data (e.g. qualitative interviews, fieldnotes, and documents) using visual tools. It provides a bridge to combine computational text analysis with qualitative research methods to identify patterns and visualize relationships (based on academic work by Abramson et al. 2018, 2025). For more information, please see the [computational ethnography lab repository](https://github.com/Computational-Ethnography-Lab/Computational-Ethnography-Lab). 
+The CMAP (Cultural Mapping and Pattern Analysis) tool is free, open-source and produced by the [Computational Ethnography Lab](https://github.com/Computational-Ethnography-Lab) at Rice University.
 
-The notebook included with this toolkit explains all the methods in detail.
+---
 
-## What This Toolkit Does
+### Notebook Version & Local Installation
 
-This toolkit gives you several ways to analyze and visualize your text data:
+For an introduction, in an easy to use online version (not for sensitive data) check out the collab version [here](https://colab.research.google.com/drive/1n90EDMSiXhIaOULUMPJ4W4hqdZCh1NQw?usp=sharing)
+---
 
-1. **Basic Descriptive Statistics**: Get counts, frequencies, and key metrics about your data
+## Toolkit Capabilities
 
-2. **Data Validation Tools**: Check that your data is formatted correctly and identify potential issues
+This notebook introduces elements of visualizing text data from qualitative sources and provides tools for:
+-   Validating text data
+-   Generating basic text statistics
+-   Charting concepts
+-   Visualizing themes
+-   Drawing comparisons at the level of words, codes, concepts, and documents
+-   Allowing analyses across subsets of data (e.g. examining variation by neighborhood, occupation, time)
 
-3. **Word-Level Visualizations**:
-   - **Word Clouds**: See which words appear most often in your text
-   - **t-SNE Maps**: View how words relate to each other in a scatter-plot-like visual
-   - **Word Relationship Heatmaps**: See which words cluster together 
-   - **Semantic Networks**: Visualize connections between related concepts
+CMAP Visualization Toolkit supports advanced analytic methods that are appropriate for computational text analysis and can be used alongside in-depth readings-- including co-occurence, clustering and embedding apporaches-- with visuals such as heatmaps, t-SNE dimensional reducation plots (like a scatter plot, with words), semantic networks, word clouds, and more. The examples are designed to work with common qualitative data sources and allow granular analysis that mirror qualitative practices (at the level of words, sentences, paragraphs), yet are scalable for large datasets produced by teams.
 
-Each of the above can be run for your full data, or on subsets (e.g. only interviews with one demographic group, only fieldnotes at a single-site). Examining multiple subsets can allow comparisons.
+#### Sample Visualizations
+*Examples from this toolkit using public data on scientists' careers.*
 
-5. **Code-Level Visualizations**:
-   - **Code Co-occurrence Heatmaps**: See which qualitative codes or tags appear together
-   - **Code Networks**: Visualize relationships between different themes or codes
+<style>
+  .grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr; /* two plots per row */
+    gap: 20px;
+    max-width: 1000px;
+    margin: auto;
+  }
+  .grid-item {
+    text-align: center;
+  }
+  .plot-img {
+    width: 100%;
+    height: 200px;  /* same height for all */
+    object-fit: contain;
+    border: 1px solid #ddd;
+    border-radius: 6px;
+    background: #fafafa;
+  }
+  .caption {
+    margin-top: 8px;
+    font-size: 0.9em;
+    color: #555;
+  }
+</style>
 
-All analysis happens on your computer - no data is sent anywhere else.
+<div class="grid">
+  <div class="grid-item">
+    <img src="https://github.com/Computational-Ethnography-Lab/.github/raw/95529a5a1ffa938274ac5b4b912dbf99e26fd572/profile/images/heatmap_visualization.png" class="plot-img">
+    <div class="caption"><em>A heatmap visualizing patterned variation in interviews.</em></div>
+  </div>
 
-You can use this software with commercial qualitative data analysis by using the export process described here [blog placeholder]
+  <div class="grid-item">
+    <img src="https://github.com/Computational-Ethnography-Lab/.github/raw/95529a5a1ffa938274ac5b4b912dbf99e26fd572/profile/images/semantic_network.png" class="plot-img">
+    <div class="caption"><em>A semantic network of concepts in field notes and interviews.</em></div>
+  </div>
+
+  <div class="grid-item">
+    <img src="https://github.com/Computational-Ethnography-Lab/.github/raw/95529a5a1ffa938274ac5b4b912dbf99e26fd572/profile/images/tsne.png" class="plot-img">
+    <div class="caption"><em>A t-SNE plot for document clustering.</em></div>
+  </div>
+
+  <div class="grid-item">
+    <img src="https://github.com/Computational-Ethnography-Lab/.github/raw/95529a5a1ffa938274ac5b4b912dbf99e26fd572/profile/images/wordcloud.png" class="plot-img">
+    <div class="caption"><em>A word cloud with user-defined concept groups.</em></div>
+  </div>
+</div>
+
+** Read more about the approach [here](https://github.com/Computational-Ethnography-Lab)**
 
 ## Installation
 
@@ -442,6 +489,8 @@ For more detailed information, refer to the [Anaconda Documentation](https://doc
 
 This toolkit builds on academic work combining computational text analysis with qualitative research methods (Abramson et al. 2018, 2025). Please see the [official project website](https://computationalethnography.org/) for additional resources and related research papers.
 
-## Disclosure
+## Disclosures
 
-LLms were used to check for errors (primarily claude-sonnet), and help annotate code and documentation
+- LLMs (primarily Claude-Sonnet) were used to check for errors and help annotate code.  
+- If you find errors or are interested in collaboration, contact corey.abramson@rice.edu.  
+- This free software carries no warranty or guarantee—like life.  
