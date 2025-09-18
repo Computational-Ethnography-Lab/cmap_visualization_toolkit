@@ -2,6 +2,8 @@
 
 An easy-to-use toolkit for visualizing patterns in qualitative data, helping researchers see and share connections between words, concepts and themes alongside in-depth accounts.
 
+[![GitHub release](https://img.shields.io/github/v/release/Computational-Ethnography-Lab/cmap_visualization_toolkit?include_prereleases)](https://github.com/Computational-Ethnography-Lab/cmap_visualization_toolkit/releases)
+
 ## Table of Contents
 - [Overview](#overview)
 - [What This Toolkit Does](#what-this-toolkit-does)
