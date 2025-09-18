@@ -19,10 +19,14 @@ An easy-to-use toolkit for visualizing patterns in qualitative data, helping res
   - [Data Structure](#data-structure)
 - [Troubleshooting](#troubleshooting)
 - [Uninstallation](#uninstallation)
-- [License](#license)
 - [Training Resources](#training-resources)
 - [References](#references)
-- [Disclosure](#disclosure)
+- [Policies](#policies)
+  - [License](#license)
+  - [Authors](#authors)
+  - [Acknowledgments](#acknowledgments)
+  - [Data Ethics](#data-ethics)
+  - [Disclaimer](#disclaimer)
 
 ## Overview
 The CMAP Visualization Toolkit offers a free suite of open-source tools to analyze and visualize text data: including fieldnotes, in-depth interview transcripts, historical documents, web-pages, and other forms of non-numeric information. It is designed for scholars working with qualitative methods, who have an interest in the possibilities for pattern analysis, data visualization, and identifying alternative explanations found in computational social science's (CSS).
@@ -36,7 +40,7 @@ The CMAP (Cultural Mapping and Pattern Analysis) tool is free, open-source and p
 For an introduction, in an easy to use online version (not for sensitive data) check out the collab version [here](https://colab.research.google.com/drive/1n90EDMSiXhIaOULUMPJ4W4hqdZCh1NQw?usp=sharing)
 ---
 
-## Toolkit Capabilities
+## What This Toolkit Does
 
 This notebook introduces elements of visualizing text data from qualitative sources and provides tools for:
 -   Validating text data
@@ -79,7 +83,7 @@ CMAP Visualization Toolkit supports advanced analytic methods that are appropria
 
 **⚠️ IMPORTANT**: This toolkit requires Anaconda or Miniconda to be installed on your system. If you don't have it yet, [download and install Anaconda](https://www.anaconda.com/products/distribution) or [download and install Miniconda](https://docs.conda.io/en/latest/miniconda.html) before proceeding.
 
-### Initial Installation (Easiest Method)
+### One-Command Installation (Easiest Method) 
 
 For the simplest installation, follow these steps:
 
@@ -428,17 +432,6 @@ To remove the CMAP Visualization Toolkit from your system:
 
 This will completely remove all toolkit components from your system.
 
-## License
-See [LICENSE.md](./LICENSE.md).
-BSD 3-Clause License
-Copyright (c) 2025 Computational Ethnography Lab (Abramson et al.)
-
-**Important**: If you use this software, please cite as: "Abramson, Corey and Yuhan (Victoria) Nian. 2025. CMAP Visualization Toolkit. https://github.com/Computational-Ethnography-Lab/cmap_visualization_toolkit."
-
-Key contributors: Yuhan (Victoria) Nian, Zhuofan Li, Tara Prendergast, Jakira Silas, and others.
-
-No warranty is provided. If you want to contribute, please email corey.abramson@rice.edu.
-
 ## Training Resources
 
 ### Anaconda Setup Videos
@@ -452,8 +445,35 @@ For more detailed information, refer to the [Anaconda Documentation](https://doc
 
 This toolkit builds on academic work combining computational text analysis with qualitative research methods (Abramson et al. 2018, 2025). Please see the [lab repo](https://github.com/Computational-Ethnography-Lab) for additional resources and related research papers.
 
-## Disclosures
+# Policies
+## License
+See [LICENSE.md](./LICENSE.md).
+BSD 3-Clause License
+Copyright (c) 2025 Computational Ethnography Lab (Abramson et al.)
 
+**Important**: If you use this software, please cite as: "Abramson, Corey and Yuhan (Victoria) Nian. 2025. CMAP Visualization Toolkit. https://github.com/Computational-Ethnography-Lab/cmap_visualization_toolkit."
+
+Key contributors: Yuhan (Victoria) Nian, Zhuofan Li, Tara Prendergast, Jakira Silas, and others.
+
+No warranty is provided. If you want to contribute, please email corey.abramson@rice.edu.
+
+### Authors
+- Corey M. Abramson, Ph.D. — Associate Professor of Sociology, Rice University; PI, Computational Ethnography Lab; Co-Director, CIISR  
+- Yuhan (Victoria) Nian — Undergraduate Student, Statistics & Data Science, Rice University  
+- Zhuofan Li, Ph.D. — Assistant Professor of Sociology, Virginia Tech  
+- Tara Prendergast — Ph.D. Candidate, School of Sociology, University of Arizona  
+- Jakira Silas — Graduate Student, Sociology, Rice University
+
+  
+### Acknowledgments
+We thank all contributors to the Computational Ethnography Lab GitHub repository for their valuable feedback, testing, and improvements. This includes everyone with contributions to the public repository, in addition to the key authors listed above. Special thanks to the broader Computational Ethnography Lab community for ongoing support.
+
+### Data Ethics
+See [data_ethics.md](./DATA_ETHICS.md) for details on ethical considerations, including data anonymization, consent, and use restrictions.
+
+### Disclaimer
+See [DISCLAIMER.md](./DISCLAIMER.md) for important legal and usage disclaimers. 
+### Disclosures
 - LLMs (primarily Claude-Sonnet) were used to check for errors and help annotate code.  
 - If you find errors or are interested in collaboration, contact corey.abramson@rice.edu.  
-- This free software carries no warranty or guarantee—like life.  
+- This free software carries no warranty or guarantee—like life.
