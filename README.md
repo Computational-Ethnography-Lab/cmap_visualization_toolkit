@@ -455,20 +455,19 @@ Copyright (c) 2025 Computational Ethnography Lab (Abramson et al.)
 
 **Important**: If you use this software, please cite as: "Abramson, Corey and Yuhan (Victoria) Nian. 2025. CMAP Visualization Toolkit. https://github.com/Computational-Ethnography-Lab/cmap_visualization_toolkit."
 
-Key contributors: Yuhan (Victoria) Nian, Zhuofan Li, Tara Prendergast, Jakira Silas, and others.
-
 No warranty is provided. If you want to contribute, please email corey.abramson@rice.edu.
 
-### Authors
-- Corey M. Abramson, Ph.D. — Associate Professor of Sociology, Rice University; PI, Computational Ethnography Lab; Co-Director, CIISR  
-- Yuhan (Victoria) Nian — Undergraduate Student, Statistics & Data Science, Rice University  
-- Zhuofan Li, Ph.D. — Assistant Professor of Sociology, Virginia Tech  
-- Tara Prendergast — Ph.D. Candidate, School of Sociology, University of Arizona  
-- Jakira Silas — Graduate Student, Sociology, Rice University
+### Key Contributors
+- [**Corey M. Abramson, Ph.D.**](https://profiles.rice.edu/faculty/corey-m-abramson) - Associate Professor of Sociology, Rice University  
+- [**Zhuofan Li, Ph.D.**](https://liberalarts.vt.edu/departments-and-schools/department-of-sociology/faculty/zhuofan-li.html) — Assistant Professor of Sociology, Virginia Tech  
+- [**Tara Prendergast, Ph.D. Candidate**](https://sociology.arizona.edu/person/tara-prendergast) — School of Sociology, University of Arizona  
+- [**Victoria (Yuhan) Nian**](https://www.linkedin.com/in/yuhannian) — Undergraduate Student, Statistics/Data Science, Rice University  
+- [**Jakira Silas, Graduate Student**](https://profiles.rice.edu/student/jakira-silas) — Graduate Student, Sociology, Rice University
+- [**Kieran Turner, Graduate Sudent**](https://profiles.rice.edu/student/kieran-turner) - Graduate Student, Sociology, Rice University
 
   
 ### Acknowledgments
-We thank all contributors to the Computational Ethnography Lab GitHub repository for their valuable feedback, testing, and improvements. This includes everyone with contributions to the public repository, in addition to the key authors listed above. Special thanks to the broader Computational Ethnography Lab community for ongoing support.
+We thank all contributors to various iterations of this code for their valuable feedback, particularly the contributors above, and UC San Francisco's [Medical Cultures Lab](https://www.cultureofmedicine.org/). 
 
 ### Data Ethics
 See [data_ethics.md](./DATA_ETHICS.md) for details on ethical considerations, including data anonymization, consent, and use restrictions.
