@@ -51,32 +51,6 @@ CMAP Visualization Toolkit supports advanced analytic methods that are appropria
 #### Sample Visualizations
 *Examples from this toolkit using public data on scientists' careers.*
 
-<style>
-  .grid {
-    display: grid;
-    grid-template-columns: 1fr 1fr; /* two plots per row */
-    gap: 20px;
-    max-width: 1000px;
-    margin: auto;
-  }
-  .grid-item {
-    text-align: center;
-  }
-  .plot-img {
-    width: 100%;
-    height: 200px;  /* same height for all */
-    object-fit: contain;
-    border: 1px solid #ddd;
-    border-radius: 6px;
-    background: #fafafa;
-  }
-  .caption {
-    margin-top: 8px;
-    font-size: 0.9em;
-    color: #555;
-  }
-</style>
-
 <div class="grid">
   <div class="grid-item">
     <img src="https://github.com/Computational-Ethnography-Lab/.github/raw/95529a5a1ffa938274ac5b4b912dbf99e26fd572/profile/images/heatmap_visualization.png" class="plot-img">
