@@ -453,7 +453,8 @@ See [LICENSE.md](./LICENSE.md).
 BSD 3-Clause License
 Copyright (c) 2025 Computational Ethnography Lab (Abramson et al.)
 
-**Important**: If you use this software, please cite as: "Abramson, Corey and Yuhan (Victoria) Nian. 2025. CMAP Visualization Toolkit. https://github.com/Computational-Ethnography-Lab/cmap_visualization_toolkit."
+**Important**: If you use this software, please cite as: "Abramson, Corey and Yuhan (Victoria) Nian. 2025. CMAP Visualization Toolkit. [![DOI](https://zenodo.org/badge/1047063909.svg)](https://doi.org/10.5281/zenodo.17162829)
+https://github.com/Computational-Ethnography-Lab/cmap_visualization_toolkit."
 
 No warranty is provided. If you want to contribute, please email corey.abramson@rice.edu.
 
