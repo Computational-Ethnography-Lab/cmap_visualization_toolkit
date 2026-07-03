@@ -84,29 +84,34 @@ CMAP Visualization Toolkit supports advanced analytic methods that are appropria
 
 ## Installation
 
-**⚠️ IMPORTANT**: This toolkit requires Anaconda or Miniconda to be installed on your system. If you don't have it yet, [download and install Anaconda](https://www.anaconda.com/products/distribution) or [download and install Miniconda](https://docs.conda.io/en/latest/miniconda.html) before proceeding.
+**⚠️ IMPORTANT**: This toolkit requires Anaconda or Miniconda to be installed on your system. **⚠️**
+<br>
+_If you don't have Anaconda installed, please follow [this video guide](https://youtu.be/mP-FOogmJuM?si=rH6R8lh7MyuiRnhG) on how to [install Anaconda](https://www.anaconda.com/download)._ 
+<br><br>
 
-### One-Command Installation (Easiest Method) 
-
-For the simplest installation, follow these steps:
+### One-Command Installation ([Video Guide](https://youtu.be/dnsLjgckl4g?si=Ndzj7hu3yNUY--Ah))
 
 **If you are using anaconda:**
   -  Open the anaconda program
   -  Left-click 'Environments' (left side of the interface)
   -  Left-click (left click the arrow next to base(root)-> cick open terminal.
-  -  In the terminal window that opens, cut and paste the text in steps 1-3.
-    -   Make sure to use the version for your system (windows, mac, or linux)
+  -  In the terminal window that opens, copy and paste the text in steps 1-4.
+    -   For step 3 make sure to use the version for your system (windows, mac, or linux).
       -   _Note: some windows versions require pasting by right-clicking instead of ctrl-v_
 
 
-1. **Clone the repository**:
+1. **Install git**:
+   ```bash
+   conda install git
+   ```
+
+2. **Clone the repository**:
    ```bash
    git clone https://github.com/Computational-Ethnography-Lab/cmap_visualization_toolkit.git
    cd cmap_visualization_toolkit
    ```
    
-
-2. **Run the installation script**:
+3. **Run the installation script**:
 - This sets up the python packages needed to run the toolkit.
   
    **For macOS/Linux**:
@@ -123,7 +128,7 @@ For the simplest installation, follow these steps:
    python -c "import nltk; nltk.download('punkt'); nltk.download('stopwords'); nltk.download('wordnet'); nltk.download('averaged_perceptron_tagger'); print('NLTK resources downloaded successfully!')"
    ```
 
-3. **Launch Jupyter Notebook**:
+4. **Launch Jupyter Notebook**:
    ```bash
    jupyter notebook visualization_toolkit_final.ipynb
    ```
@@ -215,13 +220,13 @@ For users who prefer a visual interface:
 
 2. **Open the Notebook**:
    ```bash
-   jupyter notebook visulization_toolkit_final.ipynb
+   jupyter notebook visualization_toolkit_final.ipynb
    ```
    
    If using VS Code:
    1. Open VS Code
    2. Click "File" → "Open Folder" and select the cmap_visualization_toolkit folder
-   3. Find and double-click on `visulization_toolkit_final.ipynb`
+   3. Find and double-click on `visualization_toolkit_final.ipynb`
    4. When prompted, select the `cmap_visualization_toolkit` kernel
 
 3. **Run the Code**:
@@ -238,7 +243,7 @@ For users who prefer a visual interface:
 
 2. **Open the Notebook**:
    ```bash
-   jupyter notebook visulization_toolkit_final.ipynb
+   jupyter notebook visualization_toolkit_final.ipynb
    ```
 
 3. **Run Each Section**:
