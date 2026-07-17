@@ -319,6 +319,8 @@ Reproducible Jupyter notebooks (see workshop repo), CMAP visualizations, codeboo
 
 For structured analysis and visualization (e.g., using the CMAP toolkit), data should be organized into a consistent tabular format (e.g., CSV or DataFrame). Below is an example schema:
 
+> **Note:** The canonical data schema lives in the [teaching repo](https://github.com/Computational-Ethnography-Lab/teaching#data-schema-example-cmap). This paper keeps a self-contained copy so it renders standalone.
+
 ```python
 # Updated schema with Python typing
 schema = {

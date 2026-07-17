@@ -19,6 +19,7 @@ An easy-to-use toolkit for visualizing patterns in qualitative data, helping res
   - [Regular Usage](#regular-usage)
 - [Using Your Own Data](#using-your-own-data)
   - [Data Structure](#data-structure)
+- [Design Notes](#design-notes)
 - [Troubleshooting](#troubleshooting)
 - [Uninstallation](#uninstallation)
 - [Training Resources](#training-resources)
@@ -34,6 +35,8 @@ An easy-to-use toolkit for visualizing patterns in qualitative data, helping res
 The CMAP Visualization Toolkit offers a free suite of open-source tools to analyze and visualize text data: including fieldnotes, in-depth interview transcripts, historical documents, web-pages, and other forms of non-numeric information. It is designed for scholars working with qualitative methods, who have an interest in the possibilities for pattern analysis, data visualization, and identifying alternative explanations found in computational social science's (CSS).
 
 The CMAP (Cultural Mapping and Pattern Analysis) tool is free, open-source and produced by the [Computational Ethnography Lab](https://github.com/Computational-Ethnography-Lab) at Rice University.
+
+This toolkit implements the visualization step of the lab's end-to-end qualitative workflow — see [Teaching → Workflow Steps](https://github.com/Computational-Ethnography-Lab/teaching#workflow-steps-end-to-end) for the general workflow and data schema.
 
 ---
 
@@ -276,58 +279,58 @@ To analyze your own text data:
 
 ### Data Structure
 
-For technically minded users, here's the complete schema for data files (See Abramson et al. 2025):
+This is the **runtime contract** — the columns the notebook's loader (`function/vis_tool_core.py`) actually reads from your CSV. For the full conceptual schema (all fields, types, and rationale), see **[Teaching → Data Schema Example (CMAP)](https://github.com/Computational-Ethnography-Lab/teaching#data-schema-example-cmap)**.
 
-```python
-# Updated schema with Python typing
-schema = {
-    "project": str,         # List project 
-    "number": str,          # Position information
-    "reference": int,       # Position information
-    "text": str,            # Content, critical field: must not be empty
-    "document": str,        # Data source, Critical field: must not be empty
-    "old_codes": list[str], # Optional: codings, must be a list of strings
-    "start_position": int,  # Position information
-    "end_position": int,    # Position information
-    "data_group": list[str],# Optional, to differentiate document sets: Must be a list of strings
-    "text_length": int,     # Optional: NLP info
-    "word_count": int,      # Optional: NLP info
-    "doc_id": str,          # Optional: NLP info, unique paragrah level identifier
-    "codes": list[str]      # Critical for analyses with codes, Must be a list of strings
-}
-```
-```python
-  example (simulated, not actual data):
-  {
-    "project": "engineer_interviews",  
-    "number": "675:113" #For reconstructing with QDA software  
-    "reference": 244 #For reconstructing with QDA software  
-    "text": "EG002: So the thing is..." # Actual paragraph level text,
-    "document": "INTV_EG002_20250801.txt" # name of document, in which text is found
-    "start_position": 244 #For reconstructing with QDA software  
-    "end_position": 248 #For reconstructing with QDA software  
-    "data_group": ["data_type_cg_interviews","interview"] # For subsetting by data type, or characteristic
-    "text_length": 441 # nlp
-    "word_count": 82 # nlp
-    "doc_id": "EG002_76426", #unique ID for text segment in file, to reconstruct or link to raw data, sequential
-    "codes": ["narrative_life", "education_perceptions"] # qualitative codes, for concepts, themes, variables
-    "old_codes": [
-      "science_belief",
-      "subject_speech_all"
-    ] # qualitative codes, for concepts, themes, variables; archived to silo and reduce clutter
+| Column | Required? | Type | Notes |
+|--------|-----------|------|-------|
+| `text` | **Required** | string | Paragraph-level content to analyze. If no `text` column exists, the loader falls back to the first column whose name contains `text`, `content`, or `body`; if none is found it stops. |
+| `codes` | Optional | list of strings | Qualitative codes. Enables code-based analyses and code filtering. |
+| `data_group` | Optional | list of strings | Document-set labels for subsetting (e.g. by data type or characteristic). |
+| `project` | Optional | string | Project label, used to subset the data to one or more projects. |
 
-  },//
-```
-
-**Critical Fields**:
-- `text`: Main content field - cannot be empty
-- `document`: Source information - cannot be empty
-- `codes`: Required for code-based analyses - must be a list of strings if used
+Other columns from the full schema (e.g. `document`, position fields, `word_count`, `doc_id`) are preserved if present but are not required by the loader.
 
 **Important Notes**:
-- Lists (like `codes` and `data_group`) must be proper Python lists, not strings that look like lists
-- If you're exporting from qualitative data analysis software, ensure you convert any code fields to proper lists
-- The toolkit will validate your data structure and provide error messages for common issues
+- Lists (like `codes` and `data_group`) must be proper Python lists, not strings that look like lists. The loader will attempt to convert list-looking strings, but real lists are safest.
+- If you're exporting from qualitative data analysis software, ensure you convert any code fields to proper lists.
+- The toolkit will validate your data structure and provide error messages for common issues.
+
+## Design Notes
+
+Rationale for two setup steps in the notebook (`visualization_toolkit_final.ipynb`). The notebook keeps a short key-decision note at each of these steps and points here for the full explanation.
+
+### Environment Configuration
+
+In this section, we define the core directory structure used throughout the replication project. These paths help organize:
+
+- **raw data**,  
+- **trained models**,  
+- **clustering results**, and  
+- **final outputs**.
+
+This setup also makes it easier for users to customize where intermediate results and final outputs will be saved. For example, by changing these directory names, users can **create their own versions of model runs or clustering outputs without overwriting previous results.**
+
+All directories will be automatically created if they don't already exist.
+
+### Stopword Expansion and Semantic Word Family Definitions
+
+This section defines a comprehensive list of stopwords, extending NLTK’s default stopword set with:
+- **punctuation**, 
+- **contractions**, 
+- **common filler words**, and 
+- **project-specific conversational terms** that are semantically uninformative in analysis.
+
+We also build a custom `WORD_FAMILIES` dictionary, which groups related words into unified concepts (e.g., "death", "caregiver", "memory"). This allows the model to:
+- **compress synonyms and variations** into semantically meaningful units,
+- **reduce noise** in the embedding space,
+- and **support cultural/qualitative interpretation** of the results.
+
+This section also includes validation checks to:
+- Ensure **no accidental overlaps** between stopwords and key analytical terms,
+- Detect **redundant words across families**, 
+- And print summaries for user verification.
+
+These definitions are critical for interpretability in downstream visualization and clustering.
 
 ## Troubleshooting
 
@@ -403,7 +406,7 @@ For more detailed information, refer to the [Anaconda Documentation](https://doc
 
 ## References
 
-This toolkit builds on academic work combining computational text analysis with qualitative research methods (Abramson et al. 2018, 2025). Please see the [lab repo](https://github.com/Computational-Ethnography-Lab) for additional resources and related research papers.
+This toolkit builds on academic work combining computational text analysis with qualitative research methods (Abramson et al. 2018, 2025). For a curated topical bibliography with DOIs, see [Teaching → Bibliography](https://github.com/Computational-Ethnography-Lab/teaching#v-bibliography). Please see the [lab repo](https://github.com/Computational-Ethnography-Lab) for additional resources and related research papers.
 
 # Policies
 ## License
