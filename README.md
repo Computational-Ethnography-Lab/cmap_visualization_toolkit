@@ -38,6 +38,8 @@ The CMAP (Cultural Mapping and Pattern Analysis) tool is free, open-source and p
 
 This toolkit implements the visualization step of the lab's end-to-end qualitative workflow — see [Teaching → Workflow Steps](https://github.com/Computational-Ethnography-Lab/teaching#workflow-steps-end-to-end) for the general workflow and data schema.
 
+Coming from ATLAS.ti, NVivo, or MAXQDA? The [CMAP QDPX Converter](https://github.com/Computational-Ethnography-Lab/cmap_qdpx_converter) turns a QDPX (REFI-QDA) export into the CMAP-schema CSV this toolkit reads — no manual reshaping.
+
 ---
 
 ### Notebook Version & Local Installation
