@@ -164,3 +164,4 @@ __marimo__/
 !/tests
 !/tests/**
 !pytest.ini
+tests/__pycache__/
