@@ -565,15 +565,12 @@ def tokenize_and_filter(sentences, stop_list, lemmatize=True, cross_pos_normaliz
         for word, stem in word_stems.items():
             stem_to_words.setdefault(stem, []).append(word)
         
-        # Replace words with their normalized forms
-        normalized_words = []
-        already_included = set()
-        for word in words:
-            stem = word_stems[word]
-            if stem not in already_included:
-                normalized_words.append(min(stem_to_words[stem], key=len))
-                already_included.add(stem)
-            
+        # Map each token to the shortest surface form sharing its stem (preserve multiset)
+        normalized_words = [
+            min(stem_to_words[word_stems[word]], key=len)
+            for word in words
+        ]
+
         return normalized_words
     
     return words
@@ -641,14 +638,11 @@ def normalize_words(words, stop_list, lemmatize=True, cross_pos_normalize=False)
             for root, family in word_families_found.items():
                 print(f"  - {root}: {', '.join(w for w in family if w != root)}")
         
-        # Return the shortest word from each family
-        normalized = []
-        already_included = set()
-        for word in lemmatized_words:
-            stem = word_stems[word]
-            if stem not in already_included:
-                normalized.append(min(stem_to_words[stem], key=len))
-                already_included.add(stem)
+        # Map each token to the shortest surface form sharing its stem (preserve multiset)
+        normalized = [
+            min(stem_to_words[word_stems[word]], key=len)
+            for word in lemmatized_words
+        ]
     else:
         normalized = lemmatized_words
     
@@ -855,8 +849,8 @@ def train_embedding(sentences, context_window, stop_list, seed_words, clustering
         print("Extracting word embeddings across paragraphs...")
         for paragraph in tqdm(sentences):
             chunks = split_into_chunks(paragraph, max_tokens=MAX_TOKENS)
-            for chunk in chunks: 
-                inputs = tokenizer(paragraph, return_tensors="pt", truncation=True, padding=True, return_offsets_mapping=True).to(device)
+            for chunk in chunks:
+                inputs = tokenizer(chunk, return_tensors="pt", truncation=True, padding=True, return_offsets_mapping=True).to(device)
                 offset_mapping = inputs.pop("offset_mapping")
                 with torch.no_grad():
                     outputs = model(**inputs)
@@ -866,21 +860,21 @@ def train_embedding(sentences, context_window, stop_list, seed_words, clustering
                 current_word = ""
                 current_vecs = []
 
-            for i, token in enumerate(tokens):
-                if token in ["[CLS]", "[SEP]", "<s>", "</s>"] or not token.isalpha():
-                    continue
-                if token.startswith("Ġ"):
-                    if current_word and current_vecs:
-                        lemmatized = lemmatizer.lemmatize(current_word, pos='n')
-                        word_embeddings.setdefault(lemmatized, []).append(np.mean(current_vecs, axis=0))
-                    current_word = token[1:].lower()
-                    current_vecs = [hidden_states[i]]
-                else:
-                    current_word += token.lower()
-                    current_vecs.append(hidden_states[i])
-            if current_word and current_vecs:
-                lemmatized = lemmatizer.lemmatize(current_word, pos='n')
-                word_embeddings.setdefault(lemmatized, []).append(np.mean(current_vecs, axis=0))
+                for i, token in enumerate(tokens):
+                    if token in ["[CLS]", "[SEP]", "<s>", "</s>"] or not token.isalpha():
+                        continue
+                    if token.startswith("Ġ"):
+                        if current_word and current_vecs:
+                            lemmatized = lemmatizer.lemmatize(current_word, pos='n')
+                            word_embeddings.setdefault(lemmatized, []).append(np.mean(current_vecs, axis=0))
+                        current_word = token[1:].lower()
+                        current_vecs = [hidden_states[i]]
+                    else:
+                        current_word += token.lower()
+                        current_vecs.append(hidden_states[i])
+                if current_word and current_vecs:
+                    lemmatized = lemmatizer.lemmatize(current_word, pos='n')
+                    word_embeddings.setdefault(lemmatized, []).append(np.mean(current_vecs, axis=0))
                 
         print(f"Intermediate: {len(word_embeddings)} lemmatized words extracted (may include stop words).")
         print("Sample captured words (pre-filter):", list(word_embeddings.keys())[:10])
@@ -888,7 +882,7 @@ def train_embedding(sentences, context_window, stop_list, seed_words, clustering
         averaged_embeddings = {
             word: np.mean(vecs, axis=0)
             for word, vecs in word_embeddings.items()
-            if len(vecs) >= 2
+            if len(vecs) >= 1
         }
 
         candidate_words = [w for w in all_candidates if w not in seed_words and w in averaged_embeddings]
@@ -1158,6 +1152,11 @@ def plot_tsne_dimensional_reduction(
 
     # Prep matrix 
     words = list(word_embeddings.keys())
+    if len(words) != matrix.shape[0] or matrix.shape[0] != matrix.shape[1]:
+        raise ValueError(
+            f"Vocabulary/matrix alignment mismatch: len(words)={len(words)}, "
+            f"matrix.shape={matrix.shape}"
+        )
     df_matrix = pd.DataFrame(matrix, index=words, columns=words)
     print(f"df matrix index is", df_matrix.index)
     if seed_words is None or len(seed_words) == 0:
@@ -1175,36 +1174,76 @@ def plot_tsne_dimensional_reduction(
         if missing:
             print(f"Warning: the following seed words were not found and will be skipped: {missing}")
 
-    # collect candidate item around the seed words
-    neighbours: set[str] = set(present_seeds)
-    for s in present_seeds:
-        # choose a modest threshold; it is *not* the plotting threshold
-        threshold = 0.3 if clustering_method == 1 else 0.1
-        nearby = df_matrix[s][df_matrix[s] > threshold].index.tolist()
-        neighbours.update(nearby)
-
-    # basic filtering of stop-words & very common fillers
     stop_words_std = set(stopwords.words("english"))
     fillers       = {"the", "and", "to", "of", "a", "in", "is", "it", "that",
                      "was", "for", "on", "with", "as", "be", "at", "by",
                      "have", "are", "this"}
-    keep = [w for w in neighbours if w not in stop_words_std | fillers]
+    stop_filter = stop_words_std | fillers
 
-    # guarantee the seeds are kept
-    for s in present_seeds:
-        if s not in keep:
-            keep.append(s)
+    def _max_sim_to_seeds(word: str) -> float:
+        idx = words.index(word)
+        if not present_seeds:
+            return 0.0
+        return max(matrix[idx, words.index(seed)] for seed in present_seeds)
+
+    candidates = []
+    for word in words:
+        if word in present_seeds or word in stop_filter:
+            continue
+        candidates.append((word, _max_sim_to_seeds(word), words.index(word)))
+    candidates.sort(key=lambda item: (-item[1], item[2]))
+
+    cap = min(50, len(words))
+    max_added = max(0, cap - len(present_seeds))
+    added = [word for word, _, _ in candidates[:max_added]]
+
+    keep = list(present_seeds)
+    for word in added:
+        if word not in keep:
+            keep.append(word)
 
     if len(keep) < 3:
         print("Not enough words to build a meaningful t-SNE plot.")
         return
 
-    # build 2-D embedding via t-SNE
-    sub = df_matrix.loc[keep, keep]
-
     perplexity = max(2, min(30, len(keep)//3))
-    tsne = TSNE(n_components=2, random_state=42, perplexity=perplexity)
-    emb2d = tsne.fit_transform(sub)
+
+    use_precomputed = (
+        (clustering_method == 2 and distance_metric in {"cosine", "default"})
+        or (clustering_method == 3 and distance_metric == "cosine")
+        or (clustering_method == 4 and distance_metric in {"cosine", "default"})
+    )
+    use_raw_cooccurrence = clustering_method == 4 and distance_metric == "raw_weighted"
+
+    if clustering_method == 1:
+        emb2d = TSNE(
+            n_components=2,
+            random_state=42,
+            init="random",
+            perplexity=perplexity,
+        ).fit_transform(np.vstack([word_embeddings[w] for w in keep]))
+    elif use_raw_cooccurrence:
+        sub = df_matrix.loc[keep, keep]
+        emb2d = TSNE(
+            n_components=2,
+            random_state=42,
+            init="random",
+            perplexity=perplexity,
+        ).fit_transform(sub.values)
+    elif use_precomputed:
+        sub = df_matrix.loc[keep, keep]
+        dist = (1.0 - sub.values).clip(0.0, 2.0)
+        np.fill_diagonal(dist, 0.0)
+        emb2d = TSNE(
+            n_components=2,
+            metric="precomputed",
+            init="random",
+            random_state=42,
+            perplexity=perplexity,
+        ).fit_transform(dist)
+    else:
+        print("Error: unsupported t-SNE input configuration.")
+        return
 
     plot_df = pd.DataFrame({
         "x": emb2d[:, 0],
@@ -1654,11 +1693,10 @@ def plot_semantic_network(word_embeddings, seed_words, clustering_method,
         else:
             label_x, label_y = mid_x, mid_y
         
-        # Normalize the weight from 0.5-7.5 range to 1-5 range
-        normalized_w = ((w - 0.5) / 7.0) * 4.0 + 1.0
-        
-        # Format normalized cosine similarity value to 2 decimal places
-        weight_text = f"cos={normalized_w:.2f}"
+        # Format raw cosine similarity value to 2 decimal places
+        edge_idx = edge_list.index((u, v)) if (u, v) in edge_list else edge_list.index((v, u))
+        raw_sim = raw_weights[edge_idx]
+        weight_text = f"cos={raw_sim:.2f}"
         ax.text(label_x, label_y, weight_text, color='black', fontsize=10, 
                 ha='center', va='center', bbox=dict(boxstyle="round,pad=0.2", 
                 fc='white', ec='none', alpha=0.8), zorder=4, fontweight='bold')
@@ -1790,24 +1828,8 @@ def run_visuals_pipeline(input_data):
     if len(df) == 0:
         print("Error: All rows were filtered out. Please check your filter criteria.")
         return
-    
-    sentences = df['text'].dropna().tolist()
-    print(f"Final dataset: {len(sentences)} text segments ready for processing")
 
-    # Add filtered sentences tracking here
-    filtered_sentences = []
-    for sentence in sentences:
-        if not isinstance(sentence, str):
-            print(f"Not a string: type={type(sentence)}, value={sentence}")
-        tokens = tokenize_and_filter([sentence],stop_list=stop_words, 
-                                   lemmatize=True, 
-                                   cross_pos_normalize=input_data.cross_pos_normalize)
-        if tokens:  # Only keep sentences that have tokens after filtering
-            filtered_sentences.append(sentence)
-    print(f"After filtering: {len(filtered_sentences)} valid text segments")
-    
-
-    # Filter out excluded codes if specified
+    # Filter out excluded codes if specified (before sentence extraction)
     if hasattr(input_data, 'excluded_codes') and input_data.excluded_codes and 'codes' in df.columns:
         before = len(df)
         try:
@@ -1823,8 +1845,26 @@ def run_visuals_pipeline(input_data):
             print(f"Excluded codes filter: {before} → {len(df)} rows")
         except Exception as e:
             print(f"Error in excluded_codes filtering: {e}")
+
+    if len(df) == 0:
+        print("Error: All rows were filtered out after excluded_codes filter.")
+        return
     
-        # Define a custom word filter function
+    sentences = df['text'].dropna().tolist()
+    print(f"Final dataset: {len(sentences)} text segments ready for processing")
+
+    # Add filtered sentences tracking here
+    filtered_sentences = []
+    for sentence in sentences:
+        if not isinstance(sentence, str):
+            print(f"Not a string: type={type(sentence)}, value={sentence}")
+        tokens = tokenize_and_filter([sentence],stop_list=stop_words, 
+                                   lemmatize=True, 
+                                   cross_pos_normalize=input_data.cross_pos_normalize)
+        if tokens:  # Only keep sentences that have tokens after filtering
+            filtered_sentences.append(sentence)
+    print(f"After filtering: {len(filtered_sentences)} valid text segments")
+
     def custom_word_filter(word):
         # First normalize with word families
         word_lower = word.lower()
@@ -1863,7 +1903,18 @@ def run_visuals_pipeline(input_data):
             seed_words = [w.strip().lower() for w in seed_input.split(",") if w.strip()]
             print(f"Pure individual word mode: using {seed_words}")
         if use_group_label:
-                sentences = [replace_group_words(text, seed_groups) for text in sentences]
+            sentences = [replace_group_words(text, seed_groups) for text in sentences]
+            filtered_sentences = []
+            for sentence in sentences:
+                tokens = tokenize_and_filter(
+                    [sentence],
+                    stop_list=stop_words,
+                    lemmatize=True,
+                    cross_pos_normalize=input_data.cross_pos_normalize,
+                )
+                if tokens:
+                    filtered_sentences.append(sentence)
+            print(f"After group replacement filtering: {len(filtered_sentences)} valid text segments")
     else:
         # Process sentences to get word frequencies for auto-selection of top words
         print("WARNING: No seed words provided or 'NONE' specified. Using top frequent words as seeds... ")
@@ -1891,6 +1942,17 @@ def run_visuals_pipeline(input_data):
     seed_words = normalize_words(clean_seeds, stop_words, lemmatize=True, cross_pos_normalize=input_data.cross_pos_normalize)
     seed_words = list(set(seed_words))
     print("Final normalized seed words:", seed_words)
+
+    word_counts = Counter()
+    for sentence in filtered_sentences:
+        tokens = tokenize_and_filter(
+            [sentence],
+            stop_list=stop_words,
+            lemmatize=True,
+            cross_pos_normalize=input_data.cross_pos_normalize,
+        )
+        filtered_tokens = [token.lower() for token in tokens if custom_word_filter(token)]
+        word_counts.update(filtered_tokens)
     
     # Check if any seed words remain after cleaning
     if not seed_words:
@@ -1902,6 +1964,9 @@ def run_visuals_pipeline(input_data):
                 seed_words = [top_word]
                 print(f"Using '{top_word}' as seed word.")
                 break
+        if not seed_words:
+            print("ERROR: No usable seed word found after normalization and frequency fallback. Aborting pipeline.")
+            return
     
     # choose context source: keep stop-words only for RoBERTa
     if input_data.clustering_method == 1:          # 1 = RoBERTa
@@ -1936,8 +2001,9 @@ def run_visuals_pipeline(input_data):
     out_path = os.path.join(OUTPUT_DIR, filename)
 
     os.makedirs(OUTPUT_DIR, exist_ok=True)
-    fig.savefig(out_path, dpi=300, bbox_inches="tight")
-    print(f"✔ [OK] Saved {out_path}")
+    if fig is not None:
+        fig.savefig(out_path, dpi=300, bbox_inches="tight")
+        print(f"✔ [OK] Saved {out_path}")
     plt.show()
 
 
@@ -1971,11 +2037,12 @@ def run_visuals_pipeline(input_data):
     os.makedirs(OUTPUT_DIR, exist_ok=True)
     out_path = os.path.join(OUTPUT_DIR, filename)
 
-    fig_sn1.suptitle("Semantic Network (Plain)", fontsize=30, y=0.98, fontweight='bold')
-    fig_sn1.subplots_adjust(top=0.95)
+    if fig_sn1 is not None:
+        fig_sn1.suptitle("Semantic Network (Plain)", fontsize=30, y=0.98, fontweight='bold')
+        fig_sn1.subplots_adjust(top=0.95)
 
-    fig_sn1.savefig(out_path, dpi=300, bbox_inches="tight")
-    print(f"✔ [OK] Saved {out_path}")
+        fig_sn1.savefig(out_path, dpi=300, bbox_inches="tight")
+        print(f"✔ [OK] Saved {out_path}")
 
     plt.show()
 

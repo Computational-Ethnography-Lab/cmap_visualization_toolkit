@@ -159,3 +159,8 @@ __marimo__/
 !/input
 !/documentation
 !/documentation/**
+!/function
+!/function/**
+!/tests
+!/tests/**
+!pytest.ini
