@@ -1,0 +1,17 @@
+cff-version: 1.2.0
+message: "If you use this software, please cite it as below."
+title: "CMAP Visualization Toolkit"
+type: software
+authors:
+  - family-names: "Abramson"
+    given-names: "Corey M."
+    affiliation: "Rice University"
+  - family-names: "Nian"
+    given-names: "Yuhan (Victoria)"
+    affiliation: "Rice University"
+version: "0.9.5"
+date-released: "2026-07-18"
+doi: "10.5281/zenodo.17162829"
+license: "BSD-3-Clause"
+repository-code: "https://github.com/Computational-Ethnography-Lab/cmap_visualization_toolkit"
+url: "https://github.com/Computational-Ethnography-Lab/cmap_visualization_toolkit"

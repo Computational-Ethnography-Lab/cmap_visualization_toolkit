@@ -148,6 +148,7 @@ __marimo__/
 !README.md
 !visualization_toolkit_final.ipynb
 !LICENSE.md
+!CITATION.cff
 # PNG files are now ignored
 *.png
 !environment.yml

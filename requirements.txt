@@ -13,7 +13,7 @@ dash>=2.10,<3
 jupyter
 sentence-transformers>=2.2,<3.6
 transformers>=4.36,<5.1
-torch>=2.1,<2.8
+torch>=2.1,<2.9
 wordcloud>=1.9,<2
 tqdm>=4.65,<5
 joblib>=1.2,<2
