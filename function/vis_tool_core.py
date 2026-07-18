@@ -1733,6 +1733,69 @@ def plot_semantic_network(word_embeddings, seed_words, clustering_method,
     plt.axis('off'); plt.tight_layout(); return fig
 
 #---------------------------------------------------------------------------------
+# LIST-COLUMN PARSING (safe replacement for eval())
+#---------------------------------------------------------------------------------
+
+def _validate_str_items(items, max_items):
+    """Validate a parsed sequence is a bounded list of strings; raise otherwise."""
+    if len(items) > max_items:
+        raise ValueError(f"List-column cell has {len(items)} items (max {max_items})")
+    for item in items:
+        if not isinstance(item, str):
+            raise ValueError(
+                f"List-column items must be strings, got {type(item).__name__}: {item!r}"
+            )
+    return list(items)
+
+
+def parse_list_column_cell(value, max_items=1000, max_chars=100000):
+    """Parse a stringified list-column cell (``codes`` / ``data_group``) into list[str].
+
+    Safe, bounded replacement for the previous ``eval()`` on list-column cells:
+    - missing / empty values become ``[]``;
+    - a bracketed list literal is parsed with ``ast.literal_eval`` and must be a
+      flat list of strings within the size bounds;
+    - a bare scalar string becomes a single-item list;
+    - a tuple / dict / set literal, a malformed literal, non-string items, or a
+      cell exceeding the size bounds raise ``ValueError`` (fail loud) rather than
+      silently mis-parsing or executing arbitrary code.
+    """
+    if value is None:
+        return []
+    if isinstance(value, list):
+        return _validate_str_items(value, max_items)
+    if isinstance(value, str):
+        text = value.strip()
+        if not text:
+            return []
+        if text[0] == '[':
+            if len(text) > max_chars:
+                raise ValueError(
+                    f"List-column cell exceeds {max_chars} chars ({len(text)})"
+                )
+            try:
+                parsed = ast.literal_eval(text)
+            except (ValueError, SyntaxError) as exc:
+                raise ValueError(f"Malformed list-column cell: {text[:80]!r}") from exc
+            if not isinstance(parsed, list):
+                raise ValueError(
+                    f"List-column cell must be a list, got {type(parsed).__name__}: {text[:80]!r}"
+                )
+            return _validate_str_items(parsed, max_items)
+        if text[0] in '({':
+            raise ValueError(
+                f"List-column cell must be a list, not a {text[0]!r}-literal: {text[:80]!r}"
+            )
+        return [text]
+    try:
+        if pd.isna(value):
+            return []
+    except (TypeError, ValueError):
+        pass
+    return [str(value)]
+
+
+#---------------------------------------------------------------------------------
 # MAIN PIPELINE FUNCTION
 #---------------------------------------------------------------------------------
 
@@ -1786,8 +1849,7 @@ def run_visuals_pipeline(input_data):
             # Check if first non-null value is a string that looks like a list
             sample = df[col].dropna().iloc[0] if not df[col].dropna().empty else None
             if isinstance(sample, str) and (sample.startswith('[') or ',' in sample):
-                df[col] = df[col].apply(lambda x: eval(x) if isinstance(x, str) and x.strip() else 
-                                       ([] if pd.isna(x) else [x]))
+                df[col] = df[col].apply(parse_list_column_cell)
     
     # Apply Metadata Filters
     if input_data.projects and 'project' in df.columns:

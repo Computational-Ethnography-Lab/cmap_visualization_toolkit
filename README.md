@@ -334,6 +334,23 @@ This section also includes validation checks to:
 
 These definitions are critical for interpretability in downstream visualization and clustering.
 
+### Clustering Methods and Supported Distance Metrics
+
+Word-to-word similarity can be computed with one of four methods, chosen with `clustering_method` and paired with a `distance_metric`:
+
+- **1 — RoBERTa embeddings:** contextual embeddings compared with cosine similarity.
+- **2 — Co-occurrence:** `cosine` uses frequency-sensitive context vectors; the default uses the Jaccard index (set-based, binary overlap).
+- **3 — PMI (Positive Pointwise Mutual Information):** supported with `distance_metric = "cosine"` **only**. PMI builds context vectors whose similarity is meaningful under cosine; other metrics are not defined for this method, so pairing PMI with a non-cosine metric is an unsupported configuration rather than a defect. Use `"cosine"` with method 3.
+- **4 — TF-IDF weighted co-occurrence:** `cosine` (or `default`) uses cosine similarity; other values select an experimental unnormalized-sum variant.
+
+Combining a method and metric outside these supported pairings — most notably PMI with a non-cosine metric — will not produce a usable similarity matrix. This is expected behavior: select a supported method/metric pair.
+
+### Hierarchical Clustering (Ward Linkage) in the Clustered Heatmap
+
+When `clustered = True`, the heatmap also shows a dendrogram-ordered version that groups words using hierarchical clustering (Ward linkage) applied to the rows and columns of the word-by-word similarity matrix. This places similar words next to one another and reveals nested groupings.
+
+Ward linkage here operates on each word's full similarity *profile* (its row/column in the matrix). It is a deliberate choice for producing interpretable dendrograms and word groupings, not a transformation of the individual similarity values. The values shown in the standard (unclustered) heatmap are unchanged; the clustered view only reorders and annotates them.
+
 ## Troubleshooting
 
 Here are solutions to common issues you might encounter:
