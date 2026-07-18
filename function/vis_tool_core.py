@@ -379,7 +379,7 @@ def run_pmi(sentences, selected_words, context_window, cache_file, epsilon=1e-9)
 
     return filtered_embeddings, None, pmi_matrix
 
-def run_tfidf_overlap(sentences, selected_words, context_window, all_candidates, cache_file): # Get TF-IDF co-occurrnece matrix 
+def run_tfidf_overlap(sentences, selected_words, context_window, all_candidates, cache_file): # Get TF-IDF co-occurrence matrix
     """
     Calculates similarity based on TF-IDF vectors of context windows.
     The primary and recommended method is 'cosine' similarity.
