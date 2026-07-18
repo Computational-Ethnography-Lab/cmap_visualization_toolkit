@@ -2,7 +2,7 @@
 
 An easy-to-use toolkit for visualizing patterns in qualitative data, helping researchers see and share connections between words, concepts and themes alongside in-depth accounts.
 
-[![GitHub release](https://img.shields.io/github/v/release/Computational-Ethnography-Lab/cmap_visualization_toolkit?include_prereleases)](https://github.com/Computational-Ethnography-Lab/cmap_visualization_toolkit/releases)
+[![GitHub release](https://img.shields.io/github/v/release/Computational-Ethnography-Lab/cmap_visualization_toolkit?include_prereleases)](https://github.com/Computational-Ethnography-Lab/cmap_visualization_toolkit/releases) [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/Computational-Ethnography-Lab/cmap_visualization_toolkit/blob/v0.9.5/visualization_toolkit_final.ipynb)
 
 ## Table of Contents
 - [Overview](#overview)
@@ -44,7 +44,7 @@ Coming from ATLAS.ti, NVivo, or MAXQDA? The [CMAP QDPX Converter](https://github
 
 ### Notebook Version & Local Installation
 
-For an introduction, in an easy to use online version (not for sensitive data) check out the collab version [here](https://colab.research.google.com/drive/1n90EDMSiXhIaOULUMPJ4W4hqdZCh1NQw?usp=sharing)  
+For an introduction, in an easy to use online version (not for sensitive data) check out the Colab version [here](https://colab.research.google.com/github/Computational-Ethnography-Lab/cmap_visualization_toolkit/blob/v0.9.5/visualization_toolkit_final.ipynb) — it opens the current notebook straight from this repo and self-installs on first run.  
 You can find a short tutorial on using the toolkit in collab [here](https://vimeo.com/1122226315)). You can read a general description in the working paper [here](https://github.com/Computational-Ethnography-Lab/cmap_visualization_toolkit/blob/main/documentation/paper.md).
 ---
 
@@ -333,6 +333,23 @@ This section also includes validation checks to:
 - And print summaries for user verification.
 
 These definitions are critical for interpretability in downstream visualization and clustering.
+
+### Clustering Methods and Supported Distance Metrics
+
+Word-to-word similarity can be computed with one of four methods, chosen with `clustering_method` and paired with a `distance_metric`:
+
+- **1 — RoBERTa embeddings:** contextual embeddings compared with cosine similarity.
+- **2 — Co-occurrence:** `cosine` uses frequency-sensitive context vectors; the default uses the Jaccard index (set-based, binary overlap).
+- **3 — PMI (Positive Pointwise Mutual Information):** supported with `distance_metric = "cosine"` **only**. PMI builds context vectors whose similarity is meaningful under cosine; other metrics are not defined for this method, so pairing PMI with a non-cosine metric is an unsupported configuration rather than a defect. Use `"cosine"` with method 3.
+- **4 — TF-IDF weighted co-occurrence:** `cosine` (or `default`) uses cosine similarity; `distance_metric = "raw_weighted"` selects an experimental unnormalized-sum variant. No other `distance_metric` value is supported for this method.
+
+Combining a method and metric outside these supported pairings — most notably PMI with a non-cosine metric — will not produce a usable similarity matrix. This is expected behavior: select a supported method/metric pair.
+
+### Hierarchical Clustering (Ward Linkage) in the Clustered Heatmap
+
+The heatmap output always includes a dendrogram-ordered version, shown side by side with the standard (unclustered) heatmap, that groups words using hierarchical clustering (Ward linkage) applied to the rows and columns of the word-by-word similarity matrix. This places similar words next to one another and reveals nested groupings.
+
+Ward linkage here operates on each word's full similarity *profile* (its row/column in the matrix). It is a deliberate choice for producing interpretable dendrograms and word groupings, not a transformation of the individual similarity values. The values shown in the standard (unclustered) heatmap are unchanged; the clustered view only reorders and annotates them.
 
 ## Troubleshooting
 

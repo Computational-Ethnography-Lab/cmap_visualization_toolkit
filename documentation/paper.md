@@ -61,7 +61,7 @@ The main paper charts organization and functions. Full mathematical details, rel
 
 
 # CMAP Organization 
-CMAP can be run in either a Jupyter environment [via Github](https://github.com/Computational-Ethnography-Lab/cmap_visualization_toolkit.git) or Google Colab [Colab Link](https://colab.research.google.com/drive/1n90EDMSiXhIaOULUMPJ4W4hqdZCh1NQw?authuser=1#scrollTo=1jgH13I3xLbA&uniqifier=1). 
+CMAP can be run in either a Jupyter environment [via Github](https://github.com/Computational-Ethnography-Lab/cmap_visualization_toolkit.git) or Google Colab [Colab Link](https://colab.research.google.com/github/Computational-Ethnography-Lab/cmap_visualization_toolkit/blob/v0.9.5/visualization_toolkit_final.ipynb). 
 Colab is recommended for learning the methods and experimenting with public datasets. For sensitive data or extended development, users can clone the GitHub repository and run the included installation script locally. 
 
 ```bash

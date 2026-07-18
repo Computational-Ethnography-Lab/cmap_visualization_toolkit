@@ -148,6 +148,7 @@ __marimo__/
 !README.md
 !visualization_toolkit_final.ipynb
 !LICENSE.md
+!CITATION.cff
 # PNG files are now ignored
 *.png
 !environment.yml
@@ -159,3 +160,13 @@ __marimo__/
 !/input
 !/documentation
 !/documentation/**
+!/function
+!/function/**
+!/tests
+!/tests/**
+!pytest.ini
+tests/__pycache__/
+# Re-exclude bytecode under the un-ignored source dirs
+function/__pycache__/
+# Foreign module from another lane (CDPH org-cooccurrence network) — keep it out of this public repo
+function/org_cooccurrence_network.py
