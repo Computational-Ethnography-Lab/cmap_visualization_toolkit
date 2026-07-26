@@ -2,7 +2,7 @@
 
 An easy-to-use toolkit for visualizing patterns in qualitative data, helping researchers see and share connections between words, concepts and themes alongside in-depth accounts.
 
-[![GitHub release](https://img.shields.io/github/v/release/Computational-Ethnography-Lab/cmap_visualization_toolkit?include_prereleases)](https://github.com/Computational-Ethnography-Lab/cmap_visualization_toolkit/releases) [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/Computational-Ethnography-Lab/cmap_visualization_toolkit/blob/v0.9.5/visualization_toolkit_final.ipynb)
+[![GitHub release](https://img.shields.io/github/v/release/Computational-Ethnography-Lab/cmap_visualization_toolkit?include_prereleases)](https://github.com/Computational-Ethnography-Lab/cmap_visualization_toolkit/releases) [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/Computational-Ethnography-Lab/cmap_visualization_toolkit/blob/v0.9.6/visualization_toolkit_final.ipynb)
 
 ## Table of Contents
 - [Overview](#overview)
@@ -44,7 +44,7 @@ Coming from ATLAS.ti, NVivo, or MAXQDA? The [CMAP QDPX Converter](https://github
 
 ### Notebook Version & Local Installation
 
-For an introduction, in an easy to use online version (not for sensitive data) check out the Colab version [here](https://colab.research.google.com/github/Computational-Ethnography-Lab/cmap_visualization_toolkit/blob/v0.9.5/visualization_toolkit_final.ipynb) — it opens the current notebook straight from this repo and self-installs on first run.  
+For an introduction, in an easy to use online version (not for sensitive data) check out the Colab version [here](https://colab.research.google.com/github/Computational-Ethnography-Lab/cmap_visualization_toolkit/blob/v0.9.6/visualization_toolkit_final.ipynb) — it opens the current notebook straight from this repo and self-installs on first run.  
 You can find a short tutorial on using the toolkit in collab [here](https://vimeo.com/1122226315)). You can read a general description in the working paper [here](https://github.com/Computational-Ethnography-Lab/cmap_visualization_toolkit/blob/main/documentation/paper.md).
 ---
 
