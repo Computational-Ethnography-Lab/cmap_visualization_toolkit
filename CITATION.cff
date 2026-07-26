@@ -9,7 +9,7 @@ authors:
   - family-names: "Nian"
     given-names: "Yuhan (Victoria)"
     affiliation: "Rice University"
-version: "0.9.5"
+version: "0.9.6"
 date-released: "2026-07-18"
 doi: "10.5281/zenodo.17162829"
 license: "BSD-3-Clause"

@@ -1,4 +1,8 @@
 # Environment Setting 
+# Bump on every release. The notebook checks this to catch a mismatched copy
+# of this file, which otherwise shows up as a NameError inside one tool.
+__version__ = "0.9.6"
+
 # using python 3.11.5
 import os
 import sys
