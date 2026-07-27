@@ -91,10 +91,12 @@ CMAP Visualization Toolkit supports advanced analytic methods that are appropria
 
 **⚠️ IMPORTANT**: This toolkit requires Anaconda or Miniconda to be installed on your system. **⚠️**
 <br>
-_If you don't have Anaconda installed, please follow [this video guide](https://youtu.be/mP-FOogmJuM?si=rH6R8lh7MyuiRnhG) on how to [install Anaconda](https://www.anaconda.com/download)._ 
+_If you don't have Anaconda installed, please follow [this video guide](https://youtu.be/mP-FOogmJuM) on how to [install Anaconda](https://www.anaconda.com/download)._
+<br>
+_New to GitHub? Start with the lab's [introduction to GitHub](https://youtu.be/JjYRAsXUL54), then [cloning a repository](https://youtu.be/dnsLjgckl4g). All the setup videos are collected in the [teaching repo](https://github.com/Computational-Ethnography-Lab/teaching#readme)._ 
 <br><br>
 
-### One-Command Installation ([Video Guide](https://youtu.be/dnsLjgckl4g?si=Ndzj7hu3yNUY--Ah))
+### One-Command Installation ([Video Guide](https://youtu.be/dnsLjgckl4g))
 
 **If you are using anaconda:**
   -  Open the anaconda program
@@ -416,7 +418,18 @@ This will completely remove all toolkit components from your system.
 
 ## Training Resources
 
-### Anaconda Setup Videos
+### Lab Setup Videos
+
+Watch in this order if you are setting up locally for the first time. The Colab version needs none of them.
+
+- **Install Anaconda**: [Anaconda Install - Python for social science](https://youtu.be/mP-FOogmJuM)
+- **Introduction to GitHub**: [GitHub Introduction Video](https://youtu.be/JjYRAsXUL54)
+- **Clone a repository**: [GitHub Clone - GitHub for Social Science](https://youtu.be/dnsLjgckl4g)
+- **Use the toolkit in Colab**: [short tutorial](https://vimeo.com/1122226315)
+
+More background and reading: [teaching repo](https://github.com/Computational-Ethnography-Lab/teaching#readme).
+
+### Anaconda Setup Videos (external)
 
 - **Anaconda Navigator (GUI) Setup**: [Getting Started with Anaconda Navigator](https://www.youtube.com/watch?v=5mDYijMfSzs)
 - **Conda Command Line (CLI) Setup**: [Getting Started with Conda](https://www.youtube.com/watch?v=23aQdrS58e0)
