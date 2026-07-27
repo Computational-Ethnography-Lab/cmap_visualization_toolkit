@@ -423,9 +423,9 @@ This will completely remove all toolkit components from your system.
 Watch in this order if you are setting up locally for the first time. The Colab version needs none of them.
 
 - **Install Anaconda**: [Anaconda Install - Python for social science](https://youtu.be/mP-FOogmJuM)
-- **Introduction to GitHub**: [GitHub Introduction Video](https://youtu.be/JjYRAsXUL54)
-- **Clone a repository**: [GitHub Clone - GitHub for Social Science](https://youtu.be/dnsLjgckl4g)
-- **Use the toolkit in Colab**: [short tutorial](https://vimeo.com/1122226315)
+- **Introduction to GitHub**: [GitHub Introduction Video](https://youtu.be/JjYRAsXUL54), by Rice University Undergrad Alejandro Hernandez Espinoza
+- **Clone a repository**: [GitHub Clone - GitHub for Social Science](https://youtu.be/dnsLjgckl4g), by Rice grad Jakira Silas
+- **Use the toolkit in Colab**: [short tutorial](https://vimeo.com/1122226315), by Rice grad Jakira Silas
 
 More background and reading: [teaching repo](https://github.com/Computational-Ethnography-Lab/teaching#readme).
 
