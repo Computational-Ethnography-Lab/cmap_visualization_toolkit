@@ -378,7 +378,7 @@ Deliberately choosing not to automate analysis when ethical considerations. Docu
 ## Representative Scientific Applications
 
 ### Peer-Reviewed Articles
-- Abramson, Corey M., Zhuofan Li, and Tara Prendergast. Accepted 2026. "Qualitative Research in an Era of AI: A Pragmatic Approach to Data Analysis, Workflow, and Computation." *Annual Review of Sociology*. [Early preprint available](https://arxiv.org/pdf/2509.12503)
+- Abramson, Corey M., Tara Prendergast, Zhuofan Li, and Daniel Dohan. 2026. "Qualitative Research in an Era of Artificial Intelligence: A Pragmatic Approach to Data Analysis, Workflow, and Computation." *Annual Review of Sociology* 52(1):35-61. [Link](https://www.annualreviews.org/content/journals/10.1146/annurev-soc-011824-104836)
 - Abramson, Corey M., Tara Prendergast, Zhuofan Li, and Martín Sánchez-Jankowski. 2024. "Inequality in the Origins and Experiences of Pain: What 'Big (Qualitative) Data' Reveal About Social Suffering in the United States." *Russell Sage Foundation Journal of the Social Sciences* 10(5):34-65. [Link](https://www.rsfjournal.org/content/rsfjss/10/5/34.full.pdf)  
 - Arteaga, Ignacia, Alma Hernández de Jesús, Brandi Ginn, Corey M. Abramson, and Daniel Dohan. 2025. "Understanding How Social Context Shapes Decisions to Seek Institutional Care: A Qualitative Study of Experiences of Progressive Cognitive Decline Among Latinx Families." *The Gerontologist* gnaf207. [Link](https://doi.org/10.1093/geront/gnaf207)  
 - Li, Zhuofan and Corey M. Abramson. 2025. "Ethnography and Machine Learning: Synergies and Applications." In *Oxford Handbook of the Sociology of Machine Learning*, edited by [editors]. Oxford University Press. [Preprint](https://arxiv.org/abs/2412.06087)  
