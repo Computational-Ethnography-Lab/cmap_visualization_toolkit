@@ -438,7 +438,7 @@ For more detailed information, refer to the [Anaconda Documentation](https://doc
 
 ## References
 
-This toolkit builds on academic work combining computational text analysis with qualitative research methods (Abramson et al. 2018, 2025). For a curated topical bibliography with DOIs, see [Teaching → Bibliography](https://github.com/Computational-Ethnography-Lab/teaching#v-bibliography). Please see the [lab repo](https://github.com/Computational-Ethnography-Lab) for additional resources and related research papers.
+This toolkit builds on academic work combining computational text analysis with qualitative research methods (Abramson et al. 2018, 2026). For a curated topical bibliography with DOIs, see [Teaching → Bibliography](https://github.com/Computational-Ethnography-Lab/teaching#v-bibliography). Please see the [lab repo](https://github.com/Computational-Ethnography-Lab) for additional resources and related research papers.
 
 # Policies
 ## License
@@ -452,12 +452,12 @@ https://github.com/Computational-Ethnography-Lab/cmap_visualization_toolkit."
 No warranty is provided. If you want to contribute, please email corey.abramson@rice.edu.
 
 ### Key Contributors
-- [**Corey M. Abramson, Ph.D.**](https://profiles.rice.edu/faculty/corey-m-abramson) - Associate Professor of Sociology, Rice University  
+- [**Corey M. Abramson, Ph.D.**](https://profiles.rice.edu/faculty/corey-m-abramson) - Professor of Sociology, Rice University  
 - [**Zhuofan Li, Ph.D.**](https://liberalarts.vt.edu/departments-and-schools/department-of-sociology/faculty/zhuofan-li.html) — Assistant Professor of Sociology, Virginia Tech  
 - [**Tara Prendergast, Ph.D. Candidate**](https://sociology.arizona.edu/person/tara-prendergast) — School of Sociology, University of Arizona  
 - [**Victoria (Yuhan) Nian**](https://www.linkedin.com/in/yuhannian) — Undergraduate Student, Statistics/Data Science, Rice University  
 - [**Jakira Silas, Graduate Student**](https://profiles.rice.edu/student/jakira-silas) — Graduate Student, Sociology, Rice University
-- [**Kieran Turner, Graduate Sudent**](https://profiles.rice.edu/student/kieran-turner) - Graduate Student, Sociology, Rice University
+- [**Kieran Turner, Graduate Student**](https://profiles.rice.edu/student/kieran-turner) - Graduate Student, Sociology, Rice University
 
   
 ### Acknowledgments
