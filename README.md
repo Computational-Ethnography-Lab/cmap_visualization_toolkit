@@ -60,6 +60,8 @@ This notebook introduces elements of visualizing text data from qualitative sour
 
 CMAP Visualization Toolkit supports advanced analytic methods that are appropriate for computational text analysis and can be used alongside in-depth readings-- including co-occurence, clustering and embedding apporaches-- with visuals such as heatmaps, t-SNE dimensional reducation plots (like a scatter plot, with words), semantic networks, word clouds, and more. The examples are designed to work with common qualitative data sources and allow granular analysis that mirror qualitative practices (at the level of words, sentences, paragraphs), yet are scalable for large datasets produced by teams.
 
+For an empirical example of these semantic networks in published research, see Abramson et al. (2026), "[Pragmatic Sensemaking](https://doi.org/10.1016/j.socscimed.2026.119829)," *Social Science & Medicine* ([blog summary](https://computationalethnography.org/writing/pragmatic-sensemaking/)). The study-specific network pseudocode is in that article's supplemental materials.
+
 #### Sample Visualizations
 *Examples from this toolkit using public data on scientists' careers.*
 
